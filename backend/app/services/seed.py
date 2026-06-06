@@ -15,9 +15,19 @@ def seed_database(db: Session) -> dict[str, int]:
     data = json.loads(SEED_FILE.read_text(encoding="utf-8"))
 
     categories_created = 0
+    categories_updated = 0
     for item in data.get("categories", []):
-        exists = db.scalar(select(Category).where(Category.slug == item["slug"]))
-        if exists:
+        existing = db.scalar(select(Category).where(Category.slug == item["slug"]))
+        if existing:
+            changed = False
+            if existing.name != item["name"]:
+                existing.name = item["name"]
+                changed = True
+            if existing.sort_order != item.get("sort_order", 0):
+                existing.sort_order = item.get("sort_order", 0)
+                changed = True
+            if changed:
+                categories_updated += 1
             continue
         db.add(
             Category(
@@ -45,4 +55,8 @@ def seed_database(db: Session) -> dict[str, int]:
         sources_created += 1
 
     db.commit()
-    return {"categories": categories_created, "sources": sources_created}
+    return {
+        "categories": categories_created,
+        "categories_updated": categories_updated,
+        "sources": sources_created,
+    }

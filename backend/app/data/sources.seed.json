@@ -1,10 +1,19 @@
 {
   "categories": [
     {"name": "科技", "slug": "tech", "sort_order": 1},
-    {"name": "商业", "slug": "business", "sort_order": 2},
-    {"name": "综合", "slug": "general", "sort_order": 3},
-    {"name": "国际", "slug": "world", "sort_order": 4},
-    {"name": "国内", "slug": "china", "sort_order": 5}
+    {"name": "财经", "slug": "finance", "sort_order": 2},
+    {"name": "商业", "slug": "business", "sort_order": 3},
+    {"name": "国内", "slug": "china", "sort_order": 4},
+    {"name": "国际", "slug": "world", "sort_order": 5},
+    {"name": "体育", "slug": "sports", "sort_order": 6},
+    {"name": "娱乐", "slug": "entertainment", "sort_order": 7},
+    {"name": "健康", "slug": "health", "sort_order": 8},
+    {"name": "汽车", "slug": "auto", "sort_order": 9},
+    {"name": "教育", "slug": "education", "sort_order": 10},
+    {"name": "育儿", "slug": "parenting", "sort_order": 11},
+    {"name": "美食", "slug": "food", "sort_order": 12},
+    {"name": "职场", "slug": "career", "sort_order": 13},
+    {"name": "综合", "slug": "general", "sort_order": 99}
   ],
   "sources": [
     {
@@ -19,13 +28,6 @@
       "type": "rss",
       "endpoint": "https://techcrunch.com/feed/",
       "config": {"default_category": "tech"},
-      "enabled": true
-    },
-    {
-      "name": "BBC News",
-      "type": "rss",
-      "endpoint": "http://feeds.bbci.co.uk/news/rss.xml",
-      "config": {"default_category": "world"},
       "enabled": true
     },
     {
@@ -57,17 +59,52 @@
       "enabled": true
     },
     {
-      "name": "爱范儿",
-      "type": "rss",
-      "endpoint": "https://www.ifanr.com/feed",
-      "config": {"default_category": "tech", "language": "zh"},
-      "enabled": true
-    },
-    {
       "name": "IT之家",
       "type": "rss",
       "endpoint": "https://www.ithome.com/rss/",
       "config": {"default_category": "tech", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "品玩",
+      "type": "rss",
+      "endpoint": "https://www.pingwest.com/feed",
+      "config": {"default_category": "tech", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "cnBeta",
+      "type": "rss",
+      "endpoint": "https://www.cnbeta.com.tw/rss/news.xml",
+      "config": {"default_category": "tech", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "MarketWatch",
+      "type": "rss",
+      "endpoint": "https://feeds.marketwatch.com/marketwatch/topstories/",
+      "config": {"default_category": "finance"},
+      "enabled": true
+    },
+    {
+      "name": "CNBC",
+      "type": "rss",
+      "endpoint": "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114",
+      "config": {"default_category": "finance"},
+      "enabled": true
+    },
+    {
+      "name": "中新网财经",
+      "type": "rss",
+      "endpoint": "https://www.chinanews.com.cn/rss/finance.xml",
+      "config": {"default_category": "finance", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "中新网财富",
+      "type": "rss",
+      "endpoint": "https://www.chinanews.com.cn/rss/fortune.xml",
+      "config": {"default_category": "finance", "language": "zh"},
       "enabled": true
     },
     {
@@ -78,10 +115,10 @@
       "enabled": true
     },
     {
-      "name": "雷锋网",
+      "name": "36氪商业",
       "type": "rss",
-      "endpoint": "https://www.leiphone.com/feed",
-      "config": {"default_category": "tech", "language": "zh"},
+      "endpoint": "https://36kr.com/feed-article",
+      "config": {"default_category": "business", "language": "zh"},
       "enabled": true
     },
     {
@@ -106,6 +143,139 @@
       "enabled": true
     },
     {
+      "name": "澎湃新闻",
+      "type": "rss",
+      "endpoint": "https://www.thepaper.cn/rss_index.jsp",
+      "config": {"default_category": "china", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "BBC News",
+      "type": "rss",
+      "endpoint": "http://feeds.bbci.co.uk/news/rss.xml",
+      "config": {"default_category": "world"},
+      "enabled": true
+    },
+    {
+      "name": "NPR News",
+      "type": "rss",
+      "endpoint": "https://www.npr.org/rss/rss.php?id=1001",
+      "config": {"default_category": "world"},
+      "enabled": true
+    },
+    {
+      "name": "ESPN",
+      "type": "rss",
+      "endpoint": "https://www.espn.com/espn/rss/news",
+      "config": {"default_category": "sports"},
+      "enabled": true
+    },
+    {
+      "name": "中新网体育",
+      "type": "rss",
+      "endpoint": "https://www.chinanews.com.cn/rss/sports.xml",
+      "config": {"default_category": "sports", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "BBC Sport",
+      "type": "rss",
+      "endpoint": "http://feeds.bbci.co.uk/sport/rss.xml",
+      "config": {"default_category": "sports"},
+      "enabled": true
+    },
+    {
+      "name": "Variety",
+      "type": "rss",
+      "endpoint": "https://variety.com/feed/",
+      "config": {"default_category": "entertainment"},
+      "enabled": true
+    },
+    {
+      "name": "The Hollywood Reporter",
+      "type": "rss",
+      "endpoint": "https://www.hollywoodreporter.com/feed/",
+      "config": {"default_category": "entertainment"},
+      "enabled": true
+    },
+    {
+      "name": "中新网文娱",
+      "type": "rss",
+      "endpoint": "https://www.chinanews.com.cn/rss/ent.xml",
+      "config": {"default_category": "entertainment", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "机核",
+      "type": "rss",
+      "endpoint": "https://www.gcores.com/rss",
+      "config": {"default_category": "entertainment", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "NPR Health",
+      "type": "rss",
+      "endpoint": "https://www.npr.org/rss/rss.php?id=1128",
+      "config": {"default_category": "health"},
+      "enabled": true
+    },
+    {
+      "name": "中新网健康",
+      "type": "rss",
+      "endpoint": "https://www.chinanews.com.cn/rss/health.xml",
+      "config": {"default_category": "health", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "Ars Technica Cars",
+      "type": "rss",
+      "endpoint": "https://feeds.arstechnica.com/arstechnica/cars",
+      "config": {"default_category": "auto"},
+      "enabled": true
+    },
+    {
+      "name": "中新网汽车",
+      "type": "rss",
+      "endpoint": "https://www.chinanews.com.cn/rss/auto.xml",
+      "config": {"default_category": "auto", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "中新网教育",
+      "type": "rss",
+      "endpoint": "https://www.chinanews.com.cn/rss/edu.xml",
+      "config": {"default_category": "education", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "中新网生活",
+      "type": "rss",
+      "endpoint": "https://www.chinanews.com.cn/rss/life.xml",
+      "config": {"default_category": "parenting", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "Bon Appétit",
+      "type": "rss",
+      "endpoint": "https://www.bonappetit.com/feed/rss",
+      "config": {"default_category": "food"},
+      "enabled": true
+    },
+    {
+      "name": "Eater",
+      "type": "rss",
+      "endpoint": "https://www.eater.com/rss/index.xml",
+      "config": {"default_category": "food"},
+      "enabled": true
+    },
+    {
+      "name": "Hacker News Jobs",
+      "type": "rss",
+      "endpoint": "https://hnrss.org/jobs",
+      "config": {"default_category": "career"},
+      "enabled": true
+    },
+    {
       "name": "NewsAPI Technology",
       "type": "api",
       "endpoint": "newsapi",
@@ -125,18 +295,43 @@
         "provider": "newsapi",
         "category": "business",
         "country": "us",
-        "default_category": "business"
+        "default_category": "finance"
       },
       "enabled": true
     },
     {
-      "name": "GNews Technology",
+      "name": "NewsAPI Sports",
       "type": "api",
-      "endpoint": "gnews",
+      "endpoint": "newsapi",
       "config": {
-        "provider": "gnews",
-        "category": "technology",
-        "default_category": "tech"
+        "provider": "newsapi",
+        "category": "sports",
+        "country": "us",
+        "default_category": "sports"
+      },
+      "enabled": true
+    },
+    {
+      "name": "NewsAPI Entertainment",
+      "type": "api",
+      "endpoint": "newsapi",
+      "config": {
+        "provider": "newsapi",
+        "category": "entertainment",
+        "country": "us",
+        "default_category": "entertainment"
+      },
+      "enabled": true
+    },
+    {
+      "name": "NewsAPI Health",
+      "type": "api",
+      "endpoint": "newsapi",
+      "config": {
+        "provider": "newsapi",
+        "category": "health",
+        "country": "us",
+        "default_category": "health"
       },
       "enabled": true
     },
@@ -166,6 +361,97 @@
       "enabled": true
     },
     {
+      "name": "GNews 中文财经",
+      "type": "api",
+      "endpoint": "gnews",
+      "config": {
+        "provider": "gnews",
+        "category": "business",
+        "lang": "zh",
+        "country": "cn",
+        "default_category": "finance"
+      },
+      "enabled": true
+    },
+    {
+      "name": "GNews 中文体育",
+      "type": "api",
+      "endpoint": "gnews",
+      "config": {
+        "provider": "gnews",
+        "category": "sports",
+        "lang": "zh",
+        "country": "cn",
+        "default_category": "sports"
+      },
+      "enabled": true
+    },
+    {
+      "name": "GNews 中文娱乐",
+      "type": "api",
+      "endpoint": "gnews",
+      "config": {
+        "provider": "gnews",
+        "category": "entertainment",
+        "lang": "zh",
+        "country": "cn",
+        "default_category": "entertainment"
+      },
+      "enabled": true
+    },
+    {
+      "name": "GNews 中文健康",
+      "type": "api",
+      "endpoint": "gnews",
+      "config": {
+        "provider": "gnews",
+        "category": "health",
+        "lang": "zh",
+        "country": "cn",
+        "default_category": "health"
+      },
+      "enabled": true
+    },
+    {
+      "name": "GNews 育儿",
+      "type": "api",
+      "endpoint": "gnews",
+      "config": {
+        "provider": "gnews",
+        "q": "育儿 亲子 儿童",
+        "lang": "zh",
+        "country": "cn",
+        "default_category": "parenting"
+      },
+      "enabled": true
+    },
+    {
+      "name": "GNews 职场",
+      "type": "api",
+      "endpoint": "gnews",
+      "config": {
+        "provider": "gnews",
+        "q": "职场 招聘 就业",
+        "lang": "zh",
+        "country": "cn",
+        "default_category": "career"
+      },
+      "enabled": true
+    },
+    {
+      "name": "GNews 美食",
+      "type": "api",
+      "endpoint": "gnews",
+      "config": {
+        "provider": "gnews",
+        "q": "美食 餐饮",
+        "lang": "zh",
+        "country": "cn",
+        "default_category": "food"
+      },
+      "enabled": true
+    },
+    {
       "name": "GNews 中文头条",
       "type": "api",
       "endpoint": "gnews",
@@ -173,7 +459,7 @@
         "provider": "gnews",
         "lang": "zh",
         "country": "cn",
-        "default_category": "china"
+        "default_category": "general"
       },
       "enabled": true
     }

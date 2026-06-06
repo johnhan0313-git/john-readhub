@@ -24,7 +24,10 @@ async def lifespan(app: FastAPI):
     db = SessionLocal()
     try:
         result = seed_database(db)
-        print(f"[seed] categories={result['categories']} sources={result['sources']}")
+        print(
+            f"[seed] categories={result['categories']} "
+            f"updated={result.get('categories_updated', 0)} sources={result['sources']}"
+        )
     finally:
         db.close()
 

@@ -29,6 +29,8 @@ class IngestService:
             for raw in raw_articles:
                 if not raw.title or not raw.url:
                     continue
+                if len(raw.title.strip()) < 8:
+                    continue
 
                 hash_value = url_hash(raw.url)
                 exists = self.db.scalar(
