@@ -44,6 +44,10 @@ def seed_database(db: Session) -> dict[str, int]:
         existing = db.scalar(select(Source).where(Source.name == item["name"]))
         if existing:
             changed = False
+            new_type = SourceType(item["type"])
+            if existing.type != new_type:
+                existing.type = new_type
+                changed = True
             if existing.endpoint != item["endpoint"]:
                 existing.endpoint = item["endpoint"]
                 changed = True

@@ -25,6 +25,7 @@ class IngestService:
             inserted = 0
             config = source.config or {}
             default_category = config.get("default_category")
+            batch_hashes: set[str] = set()
 
             for raw in raw_articles:
                 if not raw.title or not raw.url:
@@ -33,11 +34,14 @@ class IngestService:
                     continue
 
                 hash_value = url_hash(raw.url)
+                if hash_value in batch_hashes:
+                    continue
                 exists = self.db.scalar(
                     select(Article.id).where(Article.url_hash == hash_value)
                 )
                 if exists:
                     continue
+                batch_hashes.add(hash_value)
 
                 if is_duplicate_title(self.db, raw.title):
                     continue

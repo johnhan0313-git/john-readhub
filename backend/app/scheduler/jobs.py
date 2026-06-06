@@ -34,6 +34,23 @@ async def fetch_rss_sources_job() -> None:
         db.close()
 
 
+async def fetch_scraper_sources_job() -> None:
+    from sqlalchemy import select
+
+    from app.models import Source, SourceType
+
+    db = SessionLocal()
+    try:
+        service = IngestService(db)
+        sources = db.scalars(
+            select(Source).where(Source.enabled.is_(True), Source.type == SourceType.SCRAPER)
+        ).all()
+        for source in sources:
+            await service.fetch_source(source)
+    finally:
+        db.close()
+
+
 async def cleanup_articles_job() -> None:
     db = SessionLocal()
     try:

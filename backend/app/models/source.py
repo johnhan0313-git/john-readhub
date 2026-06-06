@@ -13,6 +13,7 @@ from app.database import Base
 class SourceType(str, enum.Enum):
     RSS = "rss"
     API = "api"
+    SCRAPER = "scraper"
 
 
 class Source(Base):

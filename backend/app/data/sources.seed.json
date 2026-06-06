@@ -552,6 +552,64 @@
         "default_category": "general"
       },
       "enabled": true
+    },
+    {
+      "name": "猎聘",
+      "type": "scraper",
+      "endpoint": "liepin",
+      "config": {
+        "provider": "liepin",
+        "default_category": "recruitment",
+        "language": "zh",
+        "keywords": ["Python", "Java", "前端", "Go", "产品经理"],
+        "max_jobs_per_keyword": 20
+      },
+      "enabled": true
+    },
+    {
+      "name": "BOSS直聘",
+      "type": "scraper",
+      "endpoint": "boss",
+      "config": {
+        "provider": "boss",
+        "default_category": "recruitment",
+        "language": "zh",
+        "cookie_env": "SCRAPER_BOSS_COOKIE",
+        "keywords": ["Python", "Java", "前端", "Go", "算法"],
+        "city": "101010100",
+        "city_name": "北京",
+        "max_jobs_per_keyword": 15
+      },
+      "enabled": true
+    },
+    {
+      "name": "拉勾",
+      "type": "scraper",
+      "endpoint": "lagou",
+      "config": {
+        "provider": "lagou",
+        "default_category": "recruitment",
+        "language": "zh",
+        "cookie_env": "SCRAPER_LAGOU_COOKIE",
+        "keywords": ["Python", "Java", "前端", "Go", "数据分析"],
+        "city": "全国",
+        "max_jobs_per_keyword": 15
+      },
+      "enabled": true
+    },
+    {
+      "name": "脉脉招聘",
+      "type": "scraper",
+      "endpoint": "maimai",
+      "config": {
+        "provider": "maimai",
+        "default_category": "recruitment",
+        "language": "zh",
+        "cookie_env": "SCRAPER_MAIMAI_COOKIE",
+        "keywords": ["Python", "Java", "产品经理", "算法"],
+        "max_jobs_per_keyword": 15
+      },
+      "enabled": true
     }
   ]
 }
