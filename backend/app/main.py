@@ -47,8 +47,6 @@ async def lifespan(app: FastAPI):
         print("[WARN] AI_LLM_API_KEY 未配置，事件聚类功能将跳过。")
     if not settings.scraper_boss_cookie:
         print("[WARN] SCRAPER_BOSS_COOKIE 未配置，BOSS直聘爬虫将依赖 Playwright 且可能失败。")
-    if not settings.scraper_lagou_cookie:
-        print("[WARN] SCRAPER_LAGOU_COOKIE 未配置，拉勾爬虫将依赖 Playwright 且可能失败。")
     if not settings.scraper_maimai_cookie:
         print("[WARN] SCRAPER_MAIMAI_COOKIE 未配置，脉脉招聘爬虫可能无法获取职位。")
 

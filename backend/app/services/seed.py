@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.models import Category, Source, SourceType
 
 SEED_FILE = Path(__file__).resolve().parents[1] / "data" / "sources.seed.json"
+RETIRED_SOURCE_NAMES = {"拉勾"}
 
 
 def seed_database(db: Session) -> dict[str, int]:
@@ -72,10 +73,18 @@ def seed_database(db: Session) -> dict[str, int]:
         )
         sources_created += 1
 
+    retired = 0
+    for name in RETIRED_SOURCE_NAMES:
+        source = db.scalar(select(Source).where(Source.name == name))
+        if source and source.enabled:
+            source.enabled = False
+            retired += 1
+
     db.commit()
     return {
         "categories": categories_created,
         "categories_updated": categories_updated,
         "sources": sources_created,
         "sources_updated": sources_updated,
+        "sources_retired": retired,
     }

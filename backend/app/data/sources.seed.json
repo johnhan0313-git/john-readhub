@@ -583,21 +583,6 @@
       "enabled": true
     },
     {
-      "name": "拉勾",
-      "type": "scraper",
-      "endpoint": "lagou",
-      "config": {
-        "provider": "lagou",
-        "default_category": "recruitment",
-        "language": "zh",
-        "cookie_env": "SCRAPER_LAGOU_COOKIE",
-        "keywords": ["Python", "Java", "前端", "Go", "数据分析"],
-        "city": "全国",
-        "max_jobs_per_keyword": 15
-      },
-      "enabled": true
-    },
-    {
       "name": "脉脉招聘",
       "type": "scraper",
       "endpoint": "maimai",

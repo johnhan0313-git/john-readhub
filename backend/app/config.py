@@ -43,7 +43,6 @@ class Settings(BaseSettings):
 
     scraper_fetch_interval_minutes: int = 120
     scraper_boss_cookie: str = ""
-    scraper_lagou_cookie: str = ""
     scraper_maimai_cookie: str = ""
 
     ai_llm_base_url: str = "https://api.openai.com/v1"

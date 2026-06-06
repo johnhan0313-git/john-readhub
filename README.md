@@ -103,7 +103,7 @@ john-readhub/
 
 编辑 `backend/app/data/sources.seed.json` 添加 RSS 或 API 源，重启后端自动种子入库。
 
-## 招聘爬虫（BOSS直聘 / 拉勾 / 脉脉 / 猎聘）
+## 招聘爬虫（BOSS直聘 / 脉脉 / 猎聘）
 
 使用 Playwright 定向采集，职位归入 **招聘** 分类。
 
@@ -111,7 +111,6 @@ john-readhub/
 |------|----------|------|
 | 猎聘 | 开箱可用 | Playwright 拦截官方搜索 API |
 | BOSS直聘 | 需 Cookie | 反爬强，建议配置 `SCRAPER_BOSS_COOKIE` |
-| 拉勾 | 需 Cookie | WAF 拦截，建议配置 `SCRAPER_LAGOU_COOKIE` |
 | 脉脉 | 需 Cookie | 职位需登录态，配置 `SCRAPER_MAIMAI_COOKIE` |
 
 ### 安装 Playwright 浏览器
@@ -122,7 +121,7 @@ pip install -r requirements.txt
 playwright install chromium
 ```
 
-### 配置 Cookie（BOSS / 拉勾 / 脉脉）
+### 配置 Cookie（BOSS / 脉脉）
 
 1. 浏览器登录对应网站
 2. 开发者工具 → Network → 任选请求 → 复制 **Cookie** 请求头
@@ -130,7 +129,6 @@ playwright install chromium
 
 ```env
 SCRAPER_BOSS_COOKIE=__zp_stoken__=...; ...
-SCRAPER_LAGOU_COOKIE=...
 SCRAPER_MAIMAI_COOKIE=...
 ```
 
