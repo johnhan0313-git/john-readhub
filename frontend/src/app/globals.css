@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --header-height: 4rem;
+  }
+
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    @apply antialiased text-slate-800;
+  }
+}
+
+@layer components {
+  .app-shell {
+    @apply min-h-screen bg-surface-muted bg-mesh-gradient;
+  }
+
+  .site-header {
+    @apply sticky top-0 z-50 border-b border-surface-border/80 bg-white/95 shadow-sm;
+    height: var(--header-height);
+  }
+
+  .glass-card {
+    @apply rounded-2xl border border-surface-border/80 bg-white/95 p-5 shadow-card;
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-[box-shadow,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-brand-200/60 hover:shadow-card-hover;
+  }
+
+  .input-field {
+    @apply w-full rounded-xl border border-surface-border bg-white/90 px-4 py-2.5 text-sm shadow-sm transition-colors placeholder:text-slate-400 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100;
+  }
+
+  .chip {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-all;
+  }
+
+  .chip-active {
+    @apply chip bg-brand-600 text-white shadow-sm;
+  }
+
+  .chip-inactive {
+    @apply chip border border-surface-border bg-white/80 text-slate-600 hover:border-brand-300 hover:text-brand-700;
+  }
+}

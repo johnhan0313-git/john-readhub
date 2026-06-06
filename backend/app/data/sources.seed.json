@@ -1,0 +1,81 @@
+{
+  "categories": [
+    {"name": "科技", "slug": "tech", "sort_order": 1},
+    {"name": "商业", "slug": "business", "sort_order": 2},
+    {"name": "综合", "slug": "general", "sort_order": 3},
+    {"name": "国际", "slug": "world", "sort_order": 4},
+    {"name": "国内", "slug": "china", "sort_order": 5}
+  ],
+  "sources": [
+    {
+      "name": "Hacker News",
+      "type": "rss",
+      "endpoint": "https://hnrss.org/frontpage",
+      "config": {"default_category": "tech"},
+      "enabled": true
+    },
+    {
+      "name": "TechCrunch",
+      "type": "rss",
+      "endpoint": "https://techcrunch.com/feed/",
+      "config": {"default_category": "tech"},
+      "enabled": true
+    },
+    {
+      "name": "BBC News",
+      "type": "rss",
+      "endpoint": "http://feeds.bbci.co.uk/news/rss.xml",
+      "config": {"default_category": "world"},
+      "enabled": true
+    },
+    {
+      "name": "The Verge",
+      "type": "rss",
+      "endpoint": "https://www.theverge.com/rss/index.xml",
+      "config": {"default_category": "tech"},
+      "enabled": true
+    },
+    {
+      "name": "Ars Technica",
+      "type": "rss",
+      "endpoint": "https://feeds.arstechnica.com/arstechnica/index",
+      "config": {"default_category": "tech"},
+      "enabled": true
+    },
+    {
+      "name": "NewsAPI Technology",
+      "type": "api",
+      "endpoint": "newsapi",
+      "config": {
+        "provider": "newsapi",
+        "category": "technology",
+        "country": "us",
+        "default_category": "tech"
+      },
+      "enabled": true
+    },
+    {
+      "name": "NewsAPI Business",
+      "type": "api",
+      "endpoint": "newsapi",
+      "config": {
+        "provider": "newsapi",
+        "category": "business",
+        "country": "us",
+        "default_category": "business"
+      },
+      "enabled": true
+    },
+    {
+      "name": "GNews Technology",
+      "type": "api",
+      "endpoint": "gnews",
+      "config": {
+        "provider": "gnews",
+        "category": "technology",
+        "default_category": "tech"
+      },
+      "enabled": true
+    }
+  ]
+}
