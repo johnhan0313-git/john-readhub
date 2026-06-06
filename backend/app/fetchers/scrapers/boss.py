@@ -5,7 +5,7 @@ import asyncio
 import httpx
 
 from app.fetchers.base import RawArticle
-from app.fetchers.scrapers.base import build_job_article, cookie_from_config
+from app.fetchers.scrapers.base import build_job_article, cookie_from_config, cookie_value
 from app.fetchers.scrapers.playwright_util import with_page
 from app.models import Source
 
@@ -52,7 +52,7 @@ class BossZhipinFetcher:
         max_per_kw: int,
     ) -> list[RawArticle]:
         articles: list[RawArticle] = []
-        headers = {**DEFAULT_HEADERS, "Cookie": cookie}
+        headers = _boss_headers(cookie)
 
         async with httpx.AsyncClient(timeout=30.0, follow_redirects=True, headers=headers) as client:
             for keyword in keywords:
@@ -68,6 +68,13 @@ class BossZhipinFetcher:
                 response.raise_for_status()
                 data = response.json()
                 if data.get("code") != 0:
+                    msg = data.get("message", "")
+                    if data.get("code") == 37:
+                        raise RuntimeError(
+                            f"BOSS直聘返回环境异常(code=37)：{msg}。"
+                            "Cookie 格式正确也可能因 IP/指纹与浏览器不一致而失败，"
+                            "请在本机运行后端，或更新 Cookie 与 zp_token 后重试。"
+                        )
                     continue
                 articles.extend(self._parse_joblist(data, keyword))
                 await asyncio.sleep(1)
@@ -135,6 +142,14 @@ class BossZhipinFetcher:
                 )
             )
         return articles
+
+
+def _boss_headers(cookie: str) -> dict[str, str]:
+    headers = {**DEFAULT_HEADERS, "Cookie": cookie}
+    bst = cookie_value(cookie, "bst")
+    if bst:
+        headers["zp_token"] = bst
+    return headers
 
 
 def _cookie_header_to_playwright(cookie: str, domain: str) -> list[dict]:

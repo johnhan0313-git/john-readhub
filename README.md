@@ -121,18 +121,34 @@ pip install -r requirements.txt
 playwright install chromium
 ```
 
-### 配置 Cookie（BOSS / 脉脉）
+### Cookie 格式说明
 
-1. 浏览器登录对应网站
-2. 开发者工具 → Network → 任选请求 → 复制 **Cookie** 请求头
-3. 写入 `backend/.env`：
+**我无法读取你 Arc 浏览器里的 Cookie**，需要你在本机从开发者工具或 `curl` 命令里复制。
+
+格式就是 curl 里 `-b` 后面的**整段字符串**（分号分隔的 `key=value`），原样粘贴到 `.env`，不要加引号：
 
 ```env
-SCRAPER_BOSS_COOKIE=__zp_stoken__=...; ...
-SCRAPER_MAIMAI_COOKIE=...
+SCRAPER_BOSS_COOKIE=lastCity=101210100; wt2=...; bst=...; __zp_stoken__=...
+SCRAPER_MAIMAI_COOKIE=access_token=...; u=...; session=...; biz:jobs:session=...
 ```
 
-4. 重启后端，手动触发：`curl -X POST http://localhost:8001/api/admin/fetch`
+**从 curl 提取：** 找到 `-b '...'` 或 `-H 'cookie: ...'`，中间整段即为所需 Cookie。
+
+| 平台 | 关键字段 | 备注 |
+|------|----------|------|
+| BOSS直聘 | `wt2`、`zp_at`、`bst`、`__zp_stoken__` | 程序会自动用 `bst` 作为 `zp_token` 请求头 |
+| 脉脉 | `access_token`、`u`、`session`、`biz:jobs:session` | 你贴的社区接口 curl 可用，但招聘建议再抓 `maimai.cn/jobs` 相关请求 |
+
+**安全提示：** Cookie 等同登录凭证，不要提交到 Git；过期后需重新复制（通常几天到几周）。
+
+### 配置步骤
+
+1. Arc 打开 BOSS / 脉脉并已登录
+2. 开发者工具 → Network → 刷新页面 → 点任意同域请求 → 复制 **Cookie**（或像你这样复制为 curl）
+3. 写入 `backend/.env`（见上格式）
+4. 重启后端：`curl -X POST http://localhost:8001/api/admin/fetch`
+
+**说明：** 我在服务器侧用你提供的 Cookie 测试 BOSS 仍返回 `code=37 环境异常`（IP/指纹与浏览器不一致）。你在**本机 Mac** 跑后端成功率更高；猎聘无需 Cookie 即可用。
 
 爬虫默认每 **120 分钟** 运行一次（`SCRAPER_FETCH_INTERVAL_MINUTES`），比 RSS 更低频，降低封禁风险。
 

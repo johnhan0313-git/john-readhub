@@ -576,8 +576,8 @@
         "language": "zh",
         "cookie_env": "SCRAPER_BOSS_COOKIE",
         "keywords": ["Python", "Java", "前端", "Go", "算法"],
-        "city": "101010100",
-        "city_name": "北京",
+        "city": "101210100",
+        "city_name": "杭州",
         "max_jobs_per_keyword": 15
       },
       "enabled": true

@@ -12,6 +12,15 @@ _SETTING_COOKIE_KEYS = {
 }
 
 
+def cookie_value(cookie: str, name: str) -> str | None:
+    prefix = f"{name}="
+    for part in cookie.split(";"):
+        part = part.strip()
+        if part.startswith(prefix):
+            return part[len(prefix) :]
+    return None
+
+
 def cookie_from_config(config: dict) -> str | None:
     env_key = config.get("cookie_env")
     if env_key:
