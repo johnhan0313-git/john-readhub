@@ -43,6 +43,69 @@
       "enabled": true
     },
     {
+      "name": "36氪",
+      "type": "rss",
+      "endpoint": "https://www.36kr.com/feed",
+      "config": {"default_category": "tech", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "少数派",
+      "type": "rss",
+      "endpoint": "https://sspai.com/feed",
+      "config": {"default_category": "tech", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "爱范儿",
+      "type": "rss",
+      "endpoint": "https://www.ifanr.com/feed",
+      "config": {"default_category": "tech", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "IT之家",
+      "type": "rss",
+      "endpoint": "https://www.ithome.com/rss/",
+      "config": {"default_category": "tech", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "钛媒体",
+      "type": "rss",
+      "endpoint": "https://www.tmtpost.com/rss.xml",
+      "config": {"default_category": "business", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "雷锋网",
+      "type": "rss",
+      "endpoint": "https://www.leiphone.com/feed",
+      "config": {"default_category": "tech", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "新华网时政",
+      "type": "rss",
+      "endpoint": "http://www.news.cn/politics/news_politics.xml",
+      "config": {"default_category": "china", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "人民网时政",
+      "type": "rss",
+      "endpoint": "http://www.people.com.cn/rss/politics.xml",
+      "config": {"default_category": "china", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "中国新闻网",
+      "type": "rss",
+      "endpoint": "https://www.chinanews.com.cn/rss/scroll-news.xml",
+      "config": {"default_category": "china", "language": "zh"},
+      "enabled": true
+    },
+    {
       "name": "NewsAPI Technology",
       "type": "api",
       "endpoint": "newsapi",
@@ -74,6 +137,43 @@
         "provider": "gnews",
         "category": "technology",
         "default_category": "tech"
+      },
+      "enabled": true
+    },
+    {
+      "name": "NewsAPI 中国头条",
+      "type": "api",
+      "endpoint": "newsapi",
+      "config": {
+        "provider": "newsapi",
+        "country": "cn",
+        "default_category": "china",
+        "language": "zh"
+      },
+      "enabled": true
+    },
+    {
+      "name": "GNews 中文科技",
+      "type": "api",
+      "endpoint": "gnews",
+      "config": {
+        "provider": "gnews",
+        "category": "technology",
+        "lang": "zh",
+        "country": "cn",
+        "default_category": "tech"
+      },
+      "enabled": true
+    },
+    {
+      "name": "GNews 中文头条",
+      "type": "api",
+      "endpoint": "gnews",
+      "config": {
+        "provider": "gnews",
+        "lang": "zh",
+        "country": "cn",
+        "default_category": "china"
       },
       "enabled": true
     }

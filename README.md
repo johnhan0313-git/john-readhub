@@ -4,7 +4,7 @@
 
 ## 功能
 
-- **多源采集**：RSS（Hacker News、TechCrunch、BBC 等）+ NewsAPI / GNews（可选 API Key）
+- **多源采集**：RSS（36氪、少数派、IT之家、新华网、中国新闻网等国内源 + Hacker News、BBC 等）+ NewsAPI / GNews（可选 API Key，含中国区）
 - **分类汇总**：科技、商业、综合、国际、国内
 - **去重**：URL 规范化哈希 + 标题模糊匹配
 - **文章时间线**：按日期分组展示新闻流

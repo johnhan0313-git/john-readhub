@@ -67,9 +67,15 @@ def _parse_feed(content: bytes) -> list[RawArticle]:
     return articles
 
 
+DEFAULT_HEADERS = {
+    "User-Agent": "ReadHub/1.0 (+https://github.com/readhub; news aggregator)",
+    "Accept": "application/rss+xml, application/xml, text/xml, */*",
+}
+
+
 class RSSFetcher:
     async def fetch(self, source: Source) -> list[RawArticle]:
         async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
-            response = await client.get(source.endpoint)
+            response = await client.get(source.endpoint, headers=DEFAULT_HEADERS)
             response.raise_for_status()
             return await asyncio.to_thread(_parse_feed, response.content)

@@ -45,6 +45,7 @@ class IngestService:
                     raw.raw_category,
                     default_category,
                 )
+                language = raw.language or config.get("language")
 
                 self.db.add(
                     Article(
@@ -57,7 +58,7 @@ class IngestService:
                         author=raw.author[:200] if raw.author else None,
                         image_url=raw.image_url[:2000] if raw.image_url else None,
                         published_at=raw.published_at,
-                        language=raw.language,
+                        language=language,
                     )
                 )
                 inserted += 1

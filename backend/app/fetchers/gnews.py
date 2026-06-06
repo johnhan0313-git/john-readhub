@@ -25,6 +25,8 @@ class GNewsFetcher:
         }
         if config.get("category"):
             params["topic"] = config["category"]
+        if config.get("country"):
+            params["country"] = config["country"]
         if config.get("q"):
             params["q"] = config["q"]
 
