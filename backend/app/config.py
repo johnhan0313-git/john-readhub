@@ -30,8 +30,8 @@ class Settings(BaseSettings):
 
     app_name: str = "ReadHub"
     debug: bool = False
-    database_url: str = "postgresql+psycopg://readhub:readhub@localhost:5432/readhub"
-    cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
+    database_url: str = "sqlite:///./data/readhub.db"
+    cors_origins: str = "http://localhost:8000,http://127.0.0.1:8000"
 
     newsapi_key: str = ""
     gnews_api_key: str = ""

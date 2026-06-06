@@ -11,13 +11,19 @@
 - **定时任务**：启动时自动采集，RSS 每 15 分钟、全量每 30 分钟
 - **二期预留**：AI 事件聚类 API（`POST /api/admin/cluster-events`）
 
+## 端口说明
+
+| 服务 | 端口 |
+|------|------|
+| 前端（Next.js） | **8000** |
+| 后端（FastAPI） | **3000** |
+
 ## 快速开始
 
 ### 环境要求
 
 - Python 3.11+
 - Node.js 20+
-- PostgreSQL 16（或使用 Docker Compose）
 
 ### 使用 Docker Compose（推荐）
 
@@ -27,17 +33,11 @@ cp frontend/.env.example frontend/.env
 docker compose up --build
 ```
 
-访问 http://localhost:3000 ，API 文档 http://localhost:8000/docs
+访问 http://localhost:8000 ，API 文档 http://localhost:3000/docs
 
 ### 本地开发
 
-**1. 启动 PostgreSQL**（若无 Docker，可将 `backend/.env` 中 `DATABASE_URL` 改为 `sqlite:///./data/readhub.db`）
-
-```bash
-docker compose up postgres -d
-```
-
-**2. 后端**
+**1. 后端**（SQLite，数据文件 `backend/data/readhub.db`）
 
 ```bash
 cd backend
@@ -45,10 +45,10 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
-uvicorn app.main:app --reload --port 8000
+uvicorn app.main:app --reload --port 3000
 ```
 
-**3. 前端**
+**2. 前端**
 
 ```bash
 cd frontend
@@ -57,17 +57,19 @@ cp .env.example .env
 npm run dev
 ```
 
+访问 http://localhost:8000
+
 ### 手动触发采集
 
 ```bash
-curl -X POST http://localhost:8000/api/admin/fetch
+curl -X POST http://localhost:3000/api/admin/fetch
 ```
 
 ## 环境变量
 
 | 变量 | 说明 |
 |------|------|
-| `DATABASE_URL` | PostgreSQL 连接串 |
+| `DATABASE_URL` | 默认 `sqlite:///./data/readhub.db` |
 | `NEWSAPI_KEY` | [NewsAPI](https://newsapi.org/) 密钥（可选） |
 | `GNEWS_API_KEY` | [GNews](https://gnews.io/) 密钥（可选） |
 | `FETCH_INTERVAL_MINUTES` | 全量采集间隔，默认 30 |
@@ -91,7 +93,7 @@ curl -X POST http://localhost:8000/api/admin/fetch
 
 ```
 john-readhub/
-├── backend/          # FastAPI + APScheduler + PostgreSQL
+├── backend/          # FastAPI + APScheduler + SQLite
 ├── frontend/         # Next.js 15 + Tailwind
 ├── docker-compose.yml
 └── README.md

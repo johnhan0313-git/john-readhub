@@ -1,45 +1,28 @@
 services:
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: readhub
-      POSTGRES_PASSWORD: readhub
-      POSTGRES_DB: readhub
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U readhub -d readhub"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
   backend:
     build: ./backend
     ports:
-      - "8000:8000"
+      - "3000:3000"
     env_file:
       - ./backend/.env
     environment:
-      DATABASE_URL: postgresql+psycopg://readhub:readhub@postgres:5432/readhub
-    depends_on:
-      postgres:
-        condition: service_healthy
+      DATABASE_URL: sqlite:///./data/readhub.db
+    volumes:
+      - backend_data:/app/data
     restart: unless-stopped
 
   frontend:
     build: ./frontend
     ports:
-      - "3000:3000"
+      - "8000:8000"
     env_file:
       - ./frontend/.env
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000/api
+      NEXT_PUBLIC_API_URL: http://localhost:3000/api
+      PORT: "8000"
     depends_on:
       - backend
     restart: unless-stopped
 
 volumes:
-  postgres_data:
+  backend_data:

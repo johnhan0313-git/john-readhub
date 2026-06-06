@@ -25,4 +25,4 @@ frontend/.env
 .DS_Store
 
 # Data
-postgres_data/
+backend/data/

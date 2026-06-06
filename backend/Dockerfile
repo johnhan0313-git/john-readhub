@@ -9,8 +9,10 @@ RUN uv pip install --system .
 
 COPY app ./app
 
-ENV DATABASE_URL=postgresql+psycopg://readhub:readhub@postgres:5432/readhub
+RUN mkdir -p /app/data
 
-EXPOSE 8000
+ENV DATABASE_URL=sqlite:///./data/readhub.db
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE 3000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "3000"]
