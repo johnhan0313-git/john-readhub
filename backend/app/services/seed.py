@@ -39,9 +39,23 @@ def seed_database(db: Session) -> dict[str, int]:
         categories_created += 1
 
     sources_created = 0
+    sources_updated = 0
     for item in data.get("sources", []):
-        exists = db.scalar(select(Source).where(Source.name == item["name"]))
-        if exists:
+        existing = db.scalar(select(Source).where(Source.name == item["name"]))
+        if existing:
+            changed = False
+            if existing.endpoint != item["endpoint"]:
+                existing.endpoint = item["endpoint"]
+                changed = True
+            new_config = item.get("config", {})
+            if existing.config != new_config:
+                existing.config = new_config
+                changed = True
+            if existing.enabled != item.get("enabled", True):
+                existing.enabled = item.get("enabled", True)
+                changed = True
+            if changed:
+                sources_updated += 1
             continue
         db.add(
             Source(
@@ -59,4 +73,5 @@ def seed_database(db: Session) -> dict[str, int]:
         "categories": categories_created,
         "categories_updated": categories_updated,
         "sources": sources_created,
+        "sources_updated": sources_updated,
     }

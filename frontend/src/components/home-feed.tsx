@@ -51,7 +51,7 @@ export function HomeFeed() {
       <div>
         <h1 className="text-2xl font-bold text-slate-900">最新资讯</h1>
         <p className="mt-1 text-sm text-slate-500">
-          泛资讯阅读 — 科技、财经、育儿、美食等 14 类优质来源聚合
+          泛资讯阅读 — 含 IT 技术、招聘等 16 类优质来源聚合
         </p>
       </div>
 

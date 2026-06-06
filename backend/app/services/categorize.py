@@ -36,8 +36,15 @@ CATEGORY_MAP: dict[str, str] = {
     "life": "parenting",
     "food": "food",
     "career": "career",
-    "jobs": "career",
     "employment": "career",
+    "recruitment": "recruitment",
+    "jobs": "recruitment",
+    "hiring": "recruitment",
+    "it": "it",
+    "programming": "it",
+    "developer": "it",
+    "devops": "it",
+    "software": "it",
 }
 
 

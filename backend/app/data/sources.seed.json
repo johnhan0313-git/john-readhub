@@ -1,18 +1,20 @@
 {
   "categories": [
     {"name": "科技", "slug": "tech", "sort_order": 1},
-    {"name": "财经", "slug": "finance", "sort_order": 2},
-    {"name": "商业", "slug": "business", "sort_order": 3},
-    {"name": "国内", "slug": "china", "sort_order": 4},
-    {"name": "国际", "slug": "world", "sort_order": 5},
-    {"name": "体育", "slug": "sports", "sort_order": 6},
-    {"name": "娱乐", "slug": "entertainment", "sort_order": 7},
-    {"name": "健康", "slug": "health", "sort_order": 8},
-    {"name": "汽车", "slug": "auto", "sort_order": 9},
-    {"name": "教育", "slug": "education", "sort_order": 10},
-    {"name": "育儿", "slug": "parenting", "sort_order": 11},
-    {"name": "美食", "slug": "food", "sort_order": 12},
-    {"name": "职场", "slug": "career", "sort_order": 13},
+    {"name": "IT技术", "slug": "it", "sort_order": 2},
+    {"name": "财经", "slug": "finance", "sort_order": 3},
+    {"name": "商业", "slug": "business", "sort_order": 4},
+    {"name": "国内", "slug": "china", "sort_order": 5},
+    {"name": "国际", "slug": "world", "sort_order": 6},
+    {"name": "体育", "slug": "sports", "sort_order": 7},
+    {"name": "娱乐", "slug": "entertainment", "sort_order": 8},
+    {"name": "健康", "slug": "health", "sort_order": 9},
+    {"name": "汽车", "slug": "auto", "sort_order": 10},
+    {"name": "教育", "slug": "education", "sort_order": 11},
+    {"name": "育儿", "slug": "parenting", "sort_order": 12},
+    {"name": "美食", "slug": "food", "sort_order": 13},
+    {"name": "职场", "slug": "career", "sort_order": 14},
+    {"name": "招聘", "slug": "recruitment", "sort_order": 15},
     {"name": "综合", "slug": "general", "sort_order": 99}
   ],
   "sources": [
@@ -77,6 +79,48 @@
       "type": "rss",
       "endpoint": "https://www.cnbeta.com.tw/rss/news.xml",
       "config": {"default_category": "tech", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "Lobsters",
+      "type": "rss",
+      "endpoint": "https://lobste.rs/rss",
+      "config": {"default_category": "it"},
+      "enabled": true
+    },
+    {
+      "name": "The New Stack",
+      "type": "rss",
+      "endpoint": "https://thenewstack.io/feed/",
+      "config": {"default_category": "it"},
+      "enabled": true
+    },
+    {
+      "name": "开源中国",
+      "type": "rss",
+      "endpoint": "https://www.oschina.net/news/rss",
+      "config": {"default_category": "it", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "SegmentFault",
+      "type": "rss",
+      "endpoint": "https://segmentfault.com/feeds/blogs",
+      "config": {"default_category": "it", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "掘金",
+      "type": "rss",
+      "endpoint": "https://juejin.cn/rss",
+      "config": {"default_category": "it", "language": "zh"},
+      "enabled": true
+    },
+    {
+      "name": "阮一峰周刊",
+      "type": "rss",
+      "endpoint": "https://www.ruanyifeng.com/blog/atom.xml",
+      "config": {"default_category": "it", "language": "zh"},
       "enabled": true
     },
     {
@@ -272,7 +316,14 @@
       "name": "Hacker News Jobs",
       "type": "rss",
       "endpoint": "https://hnrss.org/jobs",
-      "config": {"default_category": "career"},
+      "config": {"default_category": "recruitment"},
+      "enabled": true
+    },
+    {
+      "name": "RemoteOK",
+      "type": "rss",
+      "endpoint": "https://remoteok.com/rss",
+      "config": {"default_category": "recruitment"},
       "enabled": true
     },
     {
@@ -431,10 +482,49 @@
       "endpoint": "gnews",
       "config": {
         "provider": "gnews",
-        "q": "职场 招聘 就业",
+        "q": "职场 就业 跳槽",
         "lang": "zh",
         "country": "cn",
         "default_category": "career"
+      },
+      "enabled": true
+    },
+    {
+      "name": "GNews 招聘",
+      "type": "api",
+      "endpoint": "gnews",
+      "config": {
+        "provider": "gnews",
+        "q": "招聘 校招 社招 岗位",
+        "lang": "zh",
+        "country": "cn",
+        "default_category": "recruitment"
+      },
+      "enabled": true
+    },
+    {
+      "name": "GNews IT招聘",
+      "type": "api",
+      "endpoint": "gnews",
+      "config": {
+        "provider": "gnews",
+        "q": "程序员 招聘 互联网 技术岗位",
+        "lang": "zh",
+        "country": "cn",
+        "default_category": "recruitment"
+      },
+      "enabled": true
+    },
+    {
+      "name": "GNews IT技术",
+      "type": "api",
+      "endpoint": "gnews",
+      "config": {
+        "provider": "gnews",
+        "q": "软件开发 开源 程序员 架构",
+        "lang": "zh",
+        "country": "cn",
+        "default_category": "it"
       },
       "enabled": true
     },
