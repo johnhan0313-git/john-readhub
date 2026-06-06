@@ -15,8 +15,8 @@
 
 | 服务 | 端口 |
 |------|------|
-| 前端（Next.js） | **8000** |
-| 后端（FastAPI） | **3000** |
+| 前端（Next.js） | **3001** |
+| 后端（FastAPI） | **8001** |
 
 ## 快速开始
 
@@ -33,7 +33,7 @@ cp frontend/.env.example frontend/.env
 docker compose up --build
 ```
 
-访问 http://localhost:8000 ，API 文档 http://localhost:3000/docs
+访问 http://localhost:3001 ，API 文档 http://localhost:8001/docs
 
 ### 本地开发
 
@@ -45,7 +45,7 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
-uvicorn app.main:app --reload --port 3000
+uvicorn app.main:app --reload --port 8001
 ```
 
 **2. 前端**
@@ -57,12 +57,12 @@ cp .env.example .env
 npm run dev
 ```
 
-访问 http://localhost:8000
+访问 http://localhost:3001
 
 ### 手动触发采集
 
 ```bash
-curl -X POST http://localhost:3000/api/admin/fetch
+curl -X POST http://localhost:8001/api/admin/fetch
 ```
 
 ## 环境变量

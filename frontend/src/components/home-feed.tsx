@@ -82,7 +82,7 @@ export function HomeFeed() {
 
       {isError && (
         <div className="glass-card text-center text-sm text-red-600">
-          加载失败，请确认后端服务已启动（http://localhost:3000）
+          加载失败，请确认后端服务已启动（http://localhost:8001）
         </div>
       )}
 
