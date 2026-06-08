@@ -26,3 +26,6 @@ frontend/.env
 
 # Data
 backend/data/
+
+# Local runtime
+.run/
