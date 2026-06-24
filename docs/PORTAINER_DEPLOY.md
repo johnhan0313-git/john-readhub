@@ -11,6 +11,8 @@ Cloudflare Tunnel 已配置 `*.cool-app.me` 泛域名转发到 nginx:1180，**�
 
 ## Portainer Git Stack 部署
 
+> **john-server 推荐**：若 Portainer 构建反复失败（npm 超时、容器名冲突），优先用 `./scripts/deploy-john-server.sh`（rsync + 本地构建，不依赖 GitHub clone）。
+
 1. Portainer → **Stacks** → **Add stack** → **Git repository**
 2. Repository URL：`https://github.com/johnhan0313-git/john-readhub.git`
 3. Compose path：`docker-compose.prod.yml`
@@ -27,7 +29,7 @@ john-server 访问 GitHub / 外网不稳定，分两层：
 | 场景 | 配置位置 | 说明 |
 |------|----------|------|
 | **Portainer 从 GitHub 拉代码** | Portainer 容器自身 | 见下方「Portainer 走 mihomo」 |
-| **镜像构建**（pip / npm / next/font） | `docker-compose.prod.yml` → `build.args` | 已默认走 `172.17.0.1:7890`（docker0 网关；Portainer BuildKit 不保证 `build.extra_hosts` 生效） |
+| **镜像构建**（pip / npm / next/font） | `docker-compose.prod.yml` → `build.args` | 构建代理默认 `172.17.0.1:7890`；npm 默认 `registry.npmmirror.com` |
 | **运行时采集**（RSS / API / LLM） | backend `environment` | 已默认走 mihomo；httpx 自动读 `HTTP_PROXY` |
 
 #### 让 Portainer 走 mihomo 代理（拉 GitHub 用）
@@ -49,6 +51,17 @@ environment:
 Pull 失败但容器仍在跑时，**不要反复点 Pull**；确认 mihomo 正常后重试一次即可。
 
 若 Stack 长时间卡在 **frontend `next build`**（日志出现 `socket hang up` / `Retrying 1/3`），多为构建容器无法解析 `host.docker.internal`、Google Fonts 下载失败。当前 `docker-compose.prod.yml` 构建代理已改为 `172.17.0.1:7890`；旧 Stack 需 Pull and redeploy 后才会生效。
+
+若 **frontend `npm install` 报 ECONNRESET**（连 registry.npmjs.org 失败），需确保 Git 仓库已包含 `NPM_REGISTRY=registry.npmmirror.com` 的 Dockerfile 改动后再 Pull and redeploy。
+
+若报 **容器名 Conflict**（`john-readhub-backend-1` already in use），说明有手动部署的容器占用了名称。先 `docker rm -f john-readhub-backend-1 john-readhub-frontend-1`，再 Redeploy；或改用 `./scripts/deploy-john-server.sh` 统一管理。
+
+### SSH 部署（推荐）
+
+```bash
+chmod +x scripts/deploy-john-server.sh
+./scripts/deploy-john-server.sh
+```
 
 ## 环境变量说明
 

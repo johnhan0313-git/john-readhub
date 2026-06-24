@@ -1,17 +1,22 @@
+# syntax=docker/dockerfile:1
+
 FROM node:20-alpine AS base
 
 ARG HTTP_PROXY
 ARG HTTPS_PROXY
 ARG NO_PROXY
+ARG NPM_REGISTRY=https://registry.npmmirror.com
 
 FROM base AS deps
 ARG HTTP_PROXY
 ARG HTTPS_PROXY
 ARG NO_PROXY
+ARG NPM_REGISTRY
 ENV HTTP_PROXY=$HTTP_PROXY HTTPS_PROXY=$HTTPS_PROXY NO_PROXY=$NO_PROXY
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm install
+RUN npm config set registry "${NPM_REGISTRY}" \
+    && if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 FROM base AS builder
 ARG HTTP_PROXY
@@ -22,6 +27,7 @@ ENV HTTP_PROXY=$HTTP_PROXY HTTPS_PROXY=$HTTPS_PROXY NO_PROXY=$NO_PROXY
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+COPY package.json package-lock.json* ./
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
