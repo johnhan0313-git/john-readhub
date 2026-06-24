@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "news - 新闻聚合阅读",
   description: "多源新闻爬取、分类汇总与阅读平台",
   icons: {
-    icon: "https://share.cool-app.me/logos/readhub.svg",
+    icon: "https://shared.cool-app.me/logos/readhub.svg",
   },
 };
 
