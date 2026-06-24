@@ -20,6 +20,34 @@ Cloudflare Tunnel 已配置 `*.cool-app.me` 泛域名转发到 nginx:1180，**�
 
 `docker-compose.prod.yml` 已将 backend / frontend 加入外部网络 `john-nginx_default`，**无需**再手动执行 `docker network connect`。
 
+### 代理说明（john-server 必看）
+
+john-server 访问 GitHub / 外网不稳定，分两层：
+
+| 场景 | 配置位置 | 说明 |
+|------|----------|------|
+| **Portainer 从 GitHub 拉代码** | Portainer 容器自身 | 见下方「Portainer 走 mihomo」 |
+| **镜像构建**（pip / npm） | `docker-compose.prod.yml` → `build.args` | 已默认走 `host.docker.internal:7890` |
+| **运行时采集**（RSS / API / LLM） | backend `environment` | 已默认走 mihomo；httpx 自动读 `HTTP_PROXY` |
+
+#### 让 Portainer 走 mihomo 代理（拉 GitHub 用）
+
+与 john-english-study 相同，在 **Portainer 容器**（非本 Stack）配置：
+
+```yaml
+# ~/portainer/portainer-compose.yaml
+extra_hosts:
+  - "host.docker.internal:host-gateway"
+environment:
+  HTTP_PROXY: http://host.docker.internal:7890
+  HTTPS_PROXY: http://host.docker.internal:7890
+  NO_PROXY: localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12
+```
+
+修改后 `docker compose up -d` 重启 Portainer。**mihomo 必须保持运行**（监听 `7890`），否则 Pull 仍会超时。
+
+Pull 失败但容器仍在跑时，**不要反复点 Pull**；确认 mihomo 正常后重试一次即可。
+
 ## 环境变量说明
 
 ### 不必配置（compose 内已写死）
@@ -30,8 +58,8 @@ Cloudflare Tunnel 已配置 `*.cool-app.me` 泛域名转发到 nginx:1180，**�
 | `USE_MIGRATIONS` | `true` |
 | `CORS_ORIGINS` | `https://news.cool-app.me,http://news.cool-app.me` |
 | `NEXT_PUBLIC_API_URL`（frontend build） | `/api` |
-| `HTTP_PROXY` / `HTTPS_PROXY` | `http://host.docker.internal:7890`（走宿主机 mihomo） |
-| `NO_PROXY` | 内网地址 + `john-postgresql` |
+| `HTTP_PROXY` / `HTTPS_PROXY` | `http://host.docker.internal:7890` | 运行时外网采集走宿主机 mihomo |
+| `NO_PROXY` | 内网 + `john-postgresql` | 数据库等内网不走代理 |
 
 ### 建议按需配置（Portainer Environment variables）
 
@@ -80,7 +108,7 @@ API 中所有时间字段均为 **毫秒级 Unix 时间戳**（`long`），例�
 
 Portainer → Stacks → john-readhub → **Pull and redeploy**
 
-若 GitHub 拉取超时，稍等重试或检查服务器 mihomo 是否运行。
+若 GitHub 拉取超时，先确认 **Portainer 容器** 和 **mihomo** 代理已配置（见上文），再 Pull and redeploy。
 
 ## 本地开发
 

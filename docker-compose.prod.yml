@@ -1,6 +1,13 @@
 services:
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      extra_hosts:
+        - "host.docker.internal:host-gateway"
+      args:
+        HTTP_PROXY: ${HTTP_PROXY:-http://host.docker.internal:7890}
+        HTTPS_PROXY: ${HTTPS_PROXY:-http://host.docker.internal:7890}
+        NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,john-postgresql,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12}
     container_name: john-readhub-backend-1
     ports:
       - "8001:8001"
@@ -24,6 +31,7 @@ services:
       AI_LLM_BASE_URL: ${AI_LLM_BASE_URL:-https://api.openai.com/v1}
       AI_LLM_API_KEY: ${AI_LLM_API_KEY:-}
       AI_LLM_MODEL: ${AI_LLM_MODEL:-gpt-4o-mini}
+      # john-server：RSS / NewsAPI / GNews / LLM 等外网请求走宿主机 mihomo（httpx 默认 trust_env）
       HTTP_PROXY: ${HTTP_PROXY:-http://host.docker.internal:7890}
       HTTPS_PROXY: ${HTTPS_PROXY:-http://host.docker.internal:7890}
       NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,john-postgresql,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12}
@@ -34,7 +42,12 @@ services:
   frontend:
     build:
       context: ./frontend
+      extra_hosts:
+        - "host.docker.internal:host-gateway"
       args:
+        HTTP_PROXY: ${HTTP_PROXY:-http://host.docker.internal:7890}
+        HTTPS_PROXY: ${HTTPS_PROXY:-http://host.docker.internal:7890}
+        NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12}
         NEXT_PUBLIC_API_URL: /api
     container_name: john-readhub-frontend-1
     ports:
