@@ -5,8 +5,9 @@ services:
       extra_hosts:
         - "host.docker.internal:host-gateway"
       args:
-        HTTP_PROXY: ${HTTP_PROXY:-http://host.docker.internal:7890}
-        HTTPS_PROXY: ${HTTPS_PROXY:-http://host.docker.internal:7890}
+        # 构建阶段 Portainer/BuildKit 不保证 build.extra_hosts 生效，用 docker0 网关访问宿主机 mihomo
+        HTTP_PROXY: ${BUILD_HTTP_PROXY:-http://172.17.0.1:7890}
+        HTTPS_PROXY: ${BUILD_HTTPS_PROXY:-http://172.17.0.1:7890}
         NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,john-postgresql,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12}
     container_name: john-readhub-backend-1
     ports:
@@ -45,8 +46,8 @@ services:
       extra_hosts:
         - "host.docker.internal:host-gateway"
       args:
-        HTTP_PROXY: ${HTTP_PROXY:-http://host.docker.internal:7890}
-        HTTPS_PROXY: ${HTTPS_PROXY:-http://host.docker.internal:7890}
+        HTTP_PROXY: ${BUILD_HTTP_PROXY:-http://172.17.0.1:7890}
+        HTTPS_PROXY: ${BUILD_HTTPS_PROXY:-http://172.17.0.1:7890}
         NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12}
         NEXT_PUBLIC_API_URL: /api
     container_name: john-readhub-frontend-1
