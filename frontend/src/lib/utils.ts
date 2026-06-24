@@ -5,9 +5,9 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatDateTime(iso: string | null): string {
-  if (!iso) return "未知时间";
-  const date = new Date(iso);
+export function formatDateTime(timestampMs: number | null): string {
+  if (timestampMs == null) return "未知时间";
+  const date = new Date(timestampMs);
   return date.toLocaleString("zh-CN", {
     year: "numeric",
     month: "short",

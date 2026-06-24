@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime
-
 from pydantic import BaseModel
 
 from app.schemas.article import ArticleBrief
@@ -11,8 +9,8 @@ class EventBrief(BaseModel):
     id: int
     title: str
     summary: str | None
-    first_seen_at: datetime
-    last_updated_at: datetime
+    first_seen_at: int
+    last_updated_at: int
     article_count: int = 0
 
     model_config = {"from_attributes": True}

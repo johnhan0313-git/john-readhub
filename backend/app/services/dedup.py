@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-from datetime import datetime, timedelta, timezone
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from rapidfuzz import fuzz
@@ -9,6 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models import Article
+from app.utils.time_util import days_ago_ms
 
 
 STRIP_PARAMS = {
@@ -36,7 +36,7 @@ def url_hash(url: str) -> str:
 
 
 def is_duplicate_title(db: Session, title: str, threshold: int = 90) -> bool:
-    since = datetime.now(timezone.utc) - timedelta(days=7)
+    since = days_ago_ms(7)
     recent = db.scalars(
         select(Article.title).where(Article.published_at >= since).limit(500)
     ).all()

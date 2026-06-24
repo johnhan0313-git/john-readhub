@@ -43,8 +43,8 @@ export interface ArticleBrief {
   url: string;
   author: string | null;
   image_url: string | null;
-  published_at: string | null;
-  fetched_at: string;
+  published_at: number | null;
+  fetched_at: number;
   source: SourceBrief;
   category: CategoryBrief | null;
 }

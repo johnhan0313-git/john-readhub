@@ -69,7 +69,9 @@ curl -X POST http://localhost:8001/api/admin/fetch
 
 | 变量 | 说明 |
 |------|------|
-| `DATABASE_URL` | 默认 `sqlite:///./data/readhub.db` |
+| `DATABASE_URL` | 默认 `sqlite:///./data/readhub.db`；生产见 `docker-compose.prod.yml` |
+| `USE_MIGRATIONS` | 生产 PostgreSQL 设为 `true`，启动时自动 `alembic upgrade head` |
+| `CORS_ORIGINS` | 允许的前端来源，生产为 `https://news.cool-app.me` |
 | `NEWSAPI_KEY` | [NewsAPI](https://newsapi.org/) 密钥（可选） |
 | `GNEWS_API_KEY` | [GNews](https://gnews.io/) 密钥（可选） |
 | `FETCH_INTERVAL_MINUTES` | 全量采集间隔，默认 30 |
@@ -89,15 +91,27 @@ curl -X POST http://localhost:8001/api/admin/fetch
 | POST | `/api/admin/cluster-events` | 触发 AI 事件聚类 |
 | GET | `/api/events` | 事件列表（二期） |
 
+时间字段（`published_at`、`fetched_at`、`created_at` 等）均为 **毫秒级 Unix 时间戳**（整数）。
+
 ## 项目结构
 
 ```
 john-readhub/
-├── backend/          # FastAPI + APScheduler + SQLite
+├── backend/          # FastAPI + APScheduler + SQLite/PostgreSQL
 ├── frontend/         # Next.js 15 + Tailwind
+├── deploy/           # nginx 配置片段
+├── docs/             # Portainer 部署文档
+├── scripts/          # PostgreSQL 初始化脚本
 ├── docker-compose.yml
+├── docker-compose.prod.yml
 └── README.md
 ```
+
+## 生产部署（john-server / Portainer）
+
+域名：**news.cool-app.me**，数据库：**john-postgresql**（`readhub` 库）。
+
+`docker-compose.prod.yml` 已将服务加入 `john-nginx_default` 与 `john-postgresql_default`，Deploy 即可，无需手动连网络。
 
 ## 扩展数据源
 

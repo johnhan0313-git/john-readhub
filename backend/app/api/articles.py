@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime
-
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session, joinedload
@@ -27,8 +25,8 @@ def list_articles(
     category: str | None = None,
     source_id: int | None = None,
     q: str | None = None,
-    from_date: datetime | None = Query(None, alias="from"),
-    to_date: datetime | None = Query(None, alias="to"),
+    from_date: int | None = Query(None, alias="from", description="Unix timestamp in milliseconds"),
+    to_date: int | None = Query(None, alias="to", description="Unix timestamp in milliseconds"),
     db: Session = Depends(get_db),
 ):
     query = _article_query(db)

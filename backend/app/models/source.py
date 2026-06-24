@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import enum
-from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, String, Text, func
-from sqlalchemy import JSON
+from sqlalchemy import JSON, BigInteger, Boolean, Enum, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+from app.utils.time_util import now_ms
 
 
 class SourceType(str, enum.Enum):
@@ -25,10 +24,8 @@ class Source(Base):
     endpoint: Mapped[str] = mapped_column(String(500), nullable=False)
     config: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    last_fetched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
+    last_fetched_at: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    created_at: Mapped[int] = mapped_column(BigInteger, nullable=False, default=now_ms)
 
     articles = relationship("Article", back_populates="source")
     fetch_logs = relationship("FetchLog", back_populates="source")

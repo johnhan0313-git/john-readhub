@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
-
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
@@ -10,6 +8,7 @@ from app.fetchers import get_fetcher
 from app.models import Article, FetchLog, FetchStatus, Source
 from app.services.categorize import resolve_category_slug
 from app.services.dedup import is_duplicate_title, url_hash
+from app.utils.time_util import days_ago_ms, dt_to_ms, now_ms
 
 
 class IngestService:
@@ -63,13 +62,14 @@ class IngestService:
                         category_id=category_id,
                         author=raw.author[:200] if raw.author else None,
                         image_url=raw.image_url[:2000] if raw.image_url else None,
-                        published_at=raw.published_at,
+                        published_at=dt_to_ms(raw.published_at),
+                        fetched_at=now_ms(),
                         language=language,
                     )
                 )
                 inserted += 1
 
-            source.last_fetched_at = datetime.now(timezone.utc)
+            source.last_fetched_at = now_ms()
             log.articles_count = inserted
             self.db.add(log)
             self.db.commit()
@@ -85,7 +85,7 @@ class IngestService:
             self.db.add(failed_log)
             db_source = self.db.get(Source, source.id)
             if db_source:
-                db_source.last_fetched_at = datetime.now(timezone.utc)
+                db_source.last_fetched_at = now_ms()
             self.db.commit()
             return failed_log
 
@@ -100,7 +100,7 @@ class IngestService:
 
     def cleanup_old_articles(self) -> int:
         settings = get_settings()
-        cutoff = datetime.now(timezone.utc) - timedelta(days=settings.article_retention_days)
+        cutoff = days_ago_ms(settings.article_retention_days)
         result = self.db.execute(delete(Article).where(Article.fetched_at < cutoff))
         self.db.commit()
         return result.rowcount or 0

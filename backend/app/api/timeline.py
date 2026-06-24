@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from datetime import datetime
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
@@ -10,6 +9,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app.models import Article, Category
 from app.schemas.article import ArticleBrief, TimelineGroup, TimelineResponse
+from app.utils.time_util import ms_to_date_key
 
 router = APIRouter(prefix="/timeline", tags=["timeline"])
 
@@ -37,10 +37,10 @@ def get_timeline(
     grouped: dict[str, list[ArticleBrief]] = defaultdict(list)
 
     for article in articles:
-        if article.published_at:
-            date_key = article.published_at.strftime("%Y-%m-%d")
+        if article.published_at is not None:
+            date_key = ms_to_date_key(article.published_at)
         else:
-            date_key = article.fetched_at.strftime("%Y-%m-%d")
+            date_key = ms_to_date_key(article.fetched_at)
         grouped[date_key].append(ArticleBrief.model_validate(article))
 
     groups = [

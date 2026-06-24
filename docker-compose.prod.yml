@@ -1,0 +1,53 @@
+services:
+  backend:
+    build: ./backend
+    container_name: john-readhub-backend-1
+    ports:
+      - "8001:8001"
+    networks:
+      - default
+      - john-postgresql_default
+      - john-nginx_default
+    environment:
+      DATABASE_URL: postgresql+psycopg://readhub:readhub-123@john-postgresql:5432/readhub
+      USE_MIGRATIONS: "true"
+      CORS_ORIGINS: https://news.cool-app.me,http://news.cool-app.me
+      FETCH_INTERVAL_MINUTES: ${FETCH_INTERVAL_MINUTES:-30}
+      RSS_FETCH_INTERVAL_MINUTES: ${RSS_FETCH_INTERVAL_MINUTES:-15}
+      ARTICLE_RETENTION_DAYS: ${ARTICLE_RETENTION_DAYS:-90}
+      RUN_FETCH_ON_STARTUP: ${RUN_FETCH_ON_STARTUP:-true}
+      SCRAPER_FETCH_INTERVAL_MINUTES: ${SCRAPER_FETCH_INTERVAL_MINUTES:-120}
+      NEWSAPI_KEY: ${NEWSAPI_KEY:-}
+      GNEWS_API_KEY: ${GNEWS_API_KEY:-}
+      SCRAPER_BOSS_COOKIE: ${SCRAPER_BOSS_COOKIE:-}
+      SCRAPER_MAIMAI_COOKIE: ${SCRAPER_MAIMAI_COOKIE:-}
+      AI_LLM_BASE_URL: ${AI_LLM_BASE_URL:-https://api.openai.com/v1}
+      AI_LLM_API_KEY: ${AI_LLM_API_KEY:-}
+      AI_LLM_MODEL: ${AI_LLM_MODEL:-gpt-4o-mini}
+      HTTP_PROXY: ${HTTP_PROXY:-http://host.docker.internal:7890}
+      HTTPS_PROXY: ${HTTPS_PROXY:-http://host.docker.internal:7890}
+      NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,john-postgresql,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: /api
+    container_name: john-readhub-frontend-1
+    ports:
+      - "3001:3001"
+    networks:
+      - default
+      - john-nginx_default
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  john-postgresql_default:
+    external: true
+  john-nginx_default:
+    external: true

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime
-
 from pydantic import BaseModel
 
 
@@ -11,7 +9,7 @@ class SourceResponse(BaseModel):
     type: str
     endpoint: str
     enabled: bool
-    last_fetched_at: datetime | None
+    last_fetched_at: int | None
 
     model_config = {"from_attributes": True}
 
@@ -22,7 +20,7 @@ class FetchLogResponse(BaseModel):
     status: str
     articles_count: int
     error_message: str | None
-    created_at: datetime
+    created_at: int
 
     model_config = {"from_attributes": True}
 

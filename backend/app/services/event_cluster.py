@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timedelta, timezone
 
 import httpx
 from sqlalchemy import select
@@ -9,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.models import Article, Event
+from app.utils.time_util import hours_ago_ms, now_ms
 
 
 class EventClusterService:
@@ -19,7 +19,7 @@ class EventClusterService:
         self.settings = get_settings()
 
     def get_unclustered_articles(self, hours: int = 24) -> list[Article]:
-        since = datetime.now(timezone.utc) - timedelta(hours=hours)
+        since = hours_ago_ms(hours)
         return list(
             self.db.scalars(
                 select(Article)
@@ -81,8 +81,8 @@ class EventClusterService:
             if not linked:
                 continue
 
-            now = datetime.now(timezone.utc)
-            published_times = [a.published_at for a in linked if a.published_at]
+            now = now_ms()
+            published_times = [a.published_at for a in linked if a.published_at is not None]
             first_seen = min(published_times) if published_times else now
             last_updated = max(published_times) if published_times else now
 

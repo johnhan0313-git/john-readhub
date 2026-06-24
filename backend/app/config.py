@@ -30,7 +30,9 @@ class Settings(BaseSettings):
 
     app_name: str = "ReadHub"
     debug: bool = False
+    testing: bool = False
     database_url: str = "sqlite:///./data/readhub.db"
+    use_migrations: bool = False
     cors_origins: str = "http://localhost:3001,http://127.0.0.1:3001"
 
     newsapi_key: str = ""

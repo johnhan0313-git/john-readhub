@@ -7,11 +7,11 @@ RUN pip install --no-cache-dir uv
 COPY pyproject.toml .
 RUN uv pip install --system .
 
+COPY alembic.ini .
+COPY alembic ./alembic
 COPY app ./app
 
 RUN mkdir -p /app/data
-
-ENV DATABASE_URL=sqlite:///./data/readhub.db
 
 EXPOSE 8001
 

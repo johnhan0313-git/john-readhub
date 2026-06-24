@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime
-
 from pydantic import BaseModel
 
 
@@ -27,8 +25,8 @@ class ArticleBrief(BaseModel):
     url: str
     author: str | None
     image_url: str | None
-    published_at: datetime | None
-    fetched_at: datetime
+    published_at: int | None
+    fetched_at: int
     source: SourceBrief
     category: CategoryBrief | None
 
