@@ -16,7 +16,8 @@ ARG GITHUB_TOKEN
 ENV HTTP_PROXY=$HTTP_PROXY HTTPS_PROXY=$HTTPS_PROXY NO_PROXY=$NO_PROXY
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN printf '@johnhan0313-git:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=%s\n' "$GITHUB_TOKEN" > .npmrc \
+RUN test -n "$GITHUB_TOKEN" || (echo "GITHUB_TOKEN is required to install @johnhan0313-git/shared from GitHub Packages" >&2 && exit 1) \
+    && printf '@johnhan0313-git:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=%s\nalways-auth=true\n' "$GITHUB_TOKEN" > .npmrc \
     && npm config set registry "${NPM_REGISTRY}" \
     && if [ -f package-lock.json ]; then npm ci; else npm install; fi
 

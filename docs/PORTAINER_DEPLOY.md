@@ -54,6 +54,14 @@ Pull 失败但容器仍在跑时，**不要反复点 Pull**；确认 mihomo 正�
 
 若 **frontend `npm install` 报 ECONNRESET**（连 registry.npmjs.org 失败），需确保 Git 仓库已包含 `NPM_REGISTRY=registry.npmmirror.com` 的 Dockerfile 改动后再 Pull and redeploy。
 
+若 **frontend 构建在 `npm ci` 失败（exit code 1 / 401 Unauthorized）**，多为未配置 `GITHUB_TOKEN`。在 Stack → Environment variables 添加：
+
+```
+GITHUB_TOKEN=ghp_xxxxxxxx   # read:packages 权限的 PAT
+```
+
+Token 需对 `johnhan0313-git` 组织下的 `@johnhan0313-git/shared` 包有读取权限。配置后 Pull and redeploy。
+
 若报 **容器名 Conflict**（`john-readhub-backend-1` already in use），说明有手动部署的容器占用了名称。先 `docker rm -f john-readhub-backend-1 john-readhub-frontend-1`，再 Redeploy；或改用 `./scripts/deploy-john-server.sh` 统一管理。
 
 ### SSH 部署（推荐）
@@ -80,6 +88,7 @@ chmod +x scripts/deploy-john-server.sh
 
 | 变量 | 必填 | 说明 |
 |------|------|------|
+| `GITHUB_TOKEN` | **是（构建 frontend）** | GitHub PAT，需 `read:packages`，用于拉取 `@johnhan0313-git/shared`；未填时 frontend 镜像构建会在 `npm ci` 阶段失败（401） |
 | `NEWSAPI_KEY` | 否 | [NewsAPI](https://newsapi.org/) 密钥；不配则 NewsAPI 来源采集失败，RSS 仍可用 |
 | `GNEWS_API_KEY` | 否 | [GNews](https://gnews.io/) 密钥；不配则 GNews 来源采集失败 |
 | `SCRAPER_BOSS_COOKIE` | 否 | BOSS 直聘 Cookie（curl `-b` 整段）；不配则 BOSS 爬虫可能失败 |
@@ -100,7 +109,11 @@ chmod +x scripts/deploy-john-server.sh
 
 ### Portainer 填表示例
 
-最小部署（仅 RSS，无 API Key）**可以不填任何 Environment variables**，直接 Deploy。
+最小部署（仅 RSS，无 API Key）在 Portainer 中仍需配置 **`GITHUB_TOKEN`**（frontend 构建用），其余变量可不填：
+
+```
+GITHUB_TOKEN=ghp_xxxxxxxx
+```
 
 若要 NewsAPI + 代理爬虫：
 
