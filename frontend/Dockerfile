@@ -12,10 +12,12 @@ ARG HTTP_PROXY
 ARG HTTPS_PROXY
 ARG NO_PROXY
 ARG NPM_REGISTRY
+ARG GITHUB_TOKEN
 ENV HTTP_PROXY=$HTTP_PROXY HTTPS_PROXY=$HTTPS_PROXY NO_PROXY=$NO_PROXY
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm config set registry "${NPM_REGISTRY}" \
+RUN printf '@johnhan0313-git:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=%s\n' "$GITHUB_TOKEN" > .npmrc \
+    && npm config set registry "${NPM_REGISTRY}" \
     && if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 FROM base AS builder

@@ -52,6 +52,7 @@ services:
         HTTPS_PROXY: ${BUILD_HTTPS_PROXY:-http://172.17.0.1:7890}
         NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12}
         NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
+        GITHUB_TOKEN: ${GITHUB_TOKEN}
         NEXT_PUBLIC_API_URL: /api
     container_name: john-readhub-frontend-1
     ports:

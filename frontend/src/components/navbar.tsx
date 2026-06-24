@@ -6,6 +6,8 @@ import { Clock, Newspaper } from "lucide-react";
 
 import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
+import { AppsLauncher } from "@johnhan0313-git/shared/nav";
+import "@johnhan0313-git/shared/nav.css";
 
 const links = [
   { href: "/", label: "资讯", icon: Newspaper },
@@ -37,6 +39,7 @@ export function Navbar() {
               {label}
             </Link>
           ))}
+          <AppsLauncher current="readhub" />
         </nav>
       </div>
     </header>
