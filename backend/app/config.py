@@ -28,11 +28,11 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    app_name: str = "ReadHub"
+    app_name: str = "news"
     debug: bool = False
     testing: bool = False
-    database_url: str = "sqlite:///./data/readhub.db"
-    use_migrations: bool = False
+    database_url: str = "postgresql+psycopg://readhub:readhub-123@localhost:5432/readhub"
+    use_migrations: bool = True
     cors_origins: str = "http://localhost:3001,http://127.0.0.1:3001"
 
     newsapi_key: str = ""

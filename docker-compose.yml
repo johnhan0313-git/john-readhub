@@ -6,9 +6,7 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      DATABASE_URL: sqlite:///./data/readhub.db
-    volumes:
-      - backend_data:/app/data
+      USE_MIGRATIONS: "true"
     restart: unless-stopped
 
   frontend:
@@ -23,6 +21,3 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
-
-volumes:
-  backend_data:

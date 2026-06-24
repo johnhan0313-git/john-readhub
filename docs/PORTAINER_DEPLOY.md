@@ -127,7 +127,7 @@ Portainer → Stacks → john-readhub → **Pull and redeploy**
 
 ## 本地开发
 
-仍默认 SQLite，无需 PostgreSQL：
+使用 PostgreSQL（与生产相同），先确保 `readhub` 库已创建（见 `scripts/init-postgres.sql`），再：
 
 ```bash
 cd backend && cp .env.example .env

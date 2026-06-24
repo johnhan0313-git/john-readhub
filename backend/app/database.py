@@ -4,10 +4,9 @@ import logging
 from collections.abc import Generator
 from pathlib import Path
 
-from sqlalchemy import create_engine, event, inspect, text
+from sqlalchemy import create_engine, inspect
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
-from sqlalchemy.pool import StaticPool
 
 from app.config import get_settings
 
@@ -19,18 +18,6 @@ _SessionLocal: sessionmaker[Session] | None = None
 
 class Base(DeclarativeBase):
     pass
-
-
-def _sqlite_on_connect(dbapi_connection, _connection_record) -> None:
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA journal_mode=WAL")
-    cursor.execute("PRAGMA synchronous=NORMAL")
-    cursor.execute("PRAGMA busy_timeout=30000")
-    cursor.close()
-
-
-def _is_postgresql(url: str) -> bool:
-    return url.startswith("postgresql")
 
 
 def ensure_engine() -> Engine:
@@ -45,21 +32,12 @@ def ensure_engine() -> Engine:
         _engine = None
         _SessionLocal = None
 
-    connect_args: dict[str, object] = {}
-    engine_kwargs: dict[str, object] = {}
-    if url.startswith("sqlite"):
-        connect_args["check_same_thread"] = False
-        connect_args["timeout"] = 30
-        if url.endswith(":memory:") or url.rstrip("/").endswith(":memory:"):
-            engine_kwargs["poolclass"] = StaticPool
-    elif _is_postgresql(url):
-        engine_kwargs["pool_pre_ping"] = True
-        engine_kwargs["pool_size"] = 5
-        engine_kwargs["max_overflow"] = 10
-
-    _engine = create_engine(url, connect_args=connect_args, **engine_kwargs)
-    if url.startswith("sqlite"):
-        event.listen(_engine, "connect", _sqlite_on_connect)
+    _engine = create_engine(
+        url,
+        pool_pre_ping=True,
+        pool_size=5,
+        max_overflow=10,
+    )
     _SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=_engine)
     return _engine
 
@@ -102,10 +80,6 @@ def run_migrations() -> None:
 
 def init_db() -> None:
     settings = get_settings()
-    if settings.database_url.startswith("sqlite"):
-        db_path = settings.database_url.replace("sqlite:///", "")
-        if db_path and not db_path.startswith(":"):
-            Path(db_path).parent.mkdir(parents=True, exist_ok=True)
 
     from app import models  # noqa: F401
 

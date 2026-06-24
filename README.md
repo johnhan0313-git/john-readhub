@@ -37,14 +37,14 @@ docker compose up --build
 
 ### 本地开发
 
-**1. 后端**（SQLite，数据文件 `backend/data/readhub.db`）
+**1. 后端**（PostgreSQL，默认 `readhub` 库，见 `scripts/init-postgres.sql`）
 
 ```bash
 cd backend
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env
+cp .env.example .env   # 按需改 DATABASE_URL（本地 localhost，Docker 内 john-postgresql）
 uvicorn app.main:app --reload --port 8001
 ```
 
@@ -69,8 +69,8 @@ curl -X POST http://localhost:8001/api/admin/fetch
 
 | 变量 | 说明 |
 |------|------|
-| `DATABASE_URL` | 默认 `sqlite:///./data/readhub.db`；生产见 `docker-compose.prod.yml` |
-| `USE_MIGRATIONS` | 生产 PostgreSQL 设为 `true`，启动时自动 `alembic upgrade head` |
+| `DATABASE_URL` | 默认 `postgresql+psycopg://readhub:readhub-123@localhost:5432/readhub`；生产见 `docker-compose.prod.yml` |
+| `USE_MIGRATIONS` | 默认 `true`，启动时自动 `alembic upgrade head` |
 | `CORS_ORIGINS` | 允许的前端来源，生产为 `https://news.cool-app.me` |
 | `NEWSAPI_KEY` | [NewsAPI](https://newsapi.org/) 密钥（可选） |
 | `GNEWS_API_KEY` | [GNews](https://gnews.io/) 密钥（可选） |
@@ -97,7 +97,7 @@ curl -X POST http://localhost:8001/api/admin/fetch
 
 ```
 john-readhub/
-├── backend/          # FastAPI + APScheduler + SQLite/PostgreSQL
+├── backend/          # FastAPI + APScheduler + PostgreSQL
 ├── frontend/         # Next.js 15 + Tailwind
 ├── deploy/           # nginx 配置片段
 ├── docs/             # Portainer 部署文档

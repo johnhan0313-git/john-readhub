@@ -19,7 +19,6 @@ rsync -avz --delete \
   --exclude backend/.venv \
   --exclude backend/__pycache__ \
   --exclude backend/.env \
-  --exclude backend/data \
   --exclude .env.prod \
   --exclude '**/__pycache__' \
   --exclude '.cursor' \

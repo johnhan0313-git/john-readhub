@@ -13,7 +13,7 @@ const notoSans = Noto_Sans_SC({
 });
 
 export const metadata: Metadata = {
-  title: "ReadHub - 新闻聚合阅读",
+  title: "news - 新闻聚合阅读",
   description: "多源新闻爬取、分类汇总与阅读平台",
 };
 

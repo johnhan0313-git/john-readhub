@@ -1,4 +1,4 @@
-"""initial_schema — full baseline for fresh PostgreSQL / SQLite via Alembic."""
+"""initial_schema — full baseline for fresh PostgreSQL via Alembic."""
 
 from typing import Sequence, Union
 
