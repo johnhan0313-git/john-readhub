@@ -1,3 +1,10 @@
+# Portainer Git Stack：UI 环境变量写入 stack.env；开启 Relative path volumes 后用于 compose 插值
+env_file:
+  - path: stack.env
+    required: false
+  - path: .env.prod
+    required: false
+
 services:
   backend:
     image: john-readhub-backend:latest
@@ -55,8 +62,10 @@ services:
         HTTPS_PROXY: ${BUILD_HTTPS_PROXY:-http://172.17.0.1:7890}
         NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12}
         NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
-        GITHUB_TOKEN: ${GITHUB_TOKEN}
+        GH_PACKAGES_TOKEN: ${GH_PACKAGES_TOKEN:-${GITHUB_TOKEN}}
         NEXT_PUBLIC_API_URL: /api
+      secrets:
+        - npm_token
     container_name: john-readhub-frontend-1
     ports:
       - "3001:3001"
@@ -66,6 +75,10 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+
+secrets:
+  npm_token:
+    environment: GH_PACKAGES_TOKEN
 
 networks:
   john-postgresql_default:

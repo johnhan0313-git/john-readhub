@@ -16,9 +16,10 @@ Cloudflare Tunnel 已配置 `*.cool-app.me` 泛域名转发到 nginx:1180，**�
 1. Portainer → **Stacks** → **Add stack** → **Git repository**
 2. Repository URL：`https://github.com/johnhan0313-git/john-readhub.git`
 3. Compose path：`docker-compose.prod.yml`
-4. **Stack name 填 `john-readhub`**（与 nginx 中容器名一致）
-5. 在 **Environment variables** 中按需填入（见下表）
-6. **Deploy the stack**
+4. **勾选 Enable relative path volumes**（本地路径如 `/home/john-han/apps/john-readhub`）——Git 构建需要完整仓库与 `stack.env`
+5. **Stack name 填 `john-readhub`**（与 nginx 中容器名一致）
+6. 在 **Environment variables** 中按需填入（见下表）；**改完变量必须先点 Update the stack 保存**，再 Pull and redeploy
+7. **Deploy the stack**
 
 `docker-compose.prod.yml` 已将 backend / frontend 加入外部网络 `john-nginx_default`，**无需**再手动执行 `docker network connect`。
 
@@ -54,13 +55,20 @@ Pull 失败但容器仍在跑时，**不要反复点 Pull**；确认 mihomo 正�
 
 若 **frontend `npm install` 报 ECONNRESET**（连 registry.npmjs.org 失败），需确保 Git 仓库已包含 `NPM_REGISTRY=registry.npmmirror.com` 的 Dockerfile 改动后再 Pull and redeploy。
 
-若 **frontend 构建在 `npm ci` 失败（exit code 1 / 401 Unauthorized）**，多为未配置 `GITHUB_TOKEN`。在 Stack → Environment variables 添加：
+若 **frontend 构建报 `GH_PACKAGES_TOKEN is required`** 或旧版 `GITHUB_TOKEN is required`（`npm ci` 前 exit 1），说明 **构建阶段没拿到 GitHub Packages token**。按顺序检查：
+
+1. Stack → Environment variables 使用 **`GH_PACKAGES_TOKEN`**（不要用 `GITHUB_TOKEN`，易与 Portainer 拉 Git 凭据冲突）
+2. 变量填完后点 **Update the stack** 保存，再 **Pull and redeploy**（仅 Pull 可能不带上次保存的变量）
+3. Git 仓库设置里 **Enable relative path volumes** 已开启
+4. Token 需 `read:packages`，且对 `@johnhan0313-git/shared` 有权限
 
 ```
-GITHUB_TOKEN=ghp_xxxxxxxx   # read:packages 权限的 PAT
+GH_PACKAGES_TOKEN=ghp_xxxxxxxx
 ```
 
-Token 需对 `johnhan0313-git` 组织下的 `@johnhan0313-git/shared` 包有读取权限。配置后 Pull and redeploy。
+仍失败时改用 SSH：`./scripts/deploy-john-server.sh`（在服务器 `.env.prod` 填 `GH_PACKAGES_TOKEN`）。
+
+若 **frontend 构建在 `npm ci` 失败（401 Unauthorized）**，说明 token 已传入但无效或权限不足，重新生成 PAT 并更新 `GH_PACKAGES_TOKEN`。
 
 若 **compose pull 报 `john-readhub-backend:latest` / `john-readhub-frontend:latest` 400 Bad Request**（经 `mirror.swr.myhuaweicloud.com`），说明 Portainer 在拉取阶段把本地构建镜像当成 Docker Hub 官方镜像去拉了。`docker-compose.prod.yml` 已为 backend / frontend 设置 `pull_policy: build`；Pull 最新代码后 Redeploy。临时绕过可用 SSH 脚本 `./scripts/deploy-john-server.sh`。
 
@@ -90,7 +98,7 @@ chmod +x scripts/deploy-john-server.sh
 
 | 变量 | 必填 | 说明 |
 |------|------|------|
-| `GITHUB_TOKEN` | **是（构建 frontend）** | GitHub PAT，需 `read:packages`，用于拉取 `@johnhan0313-git/shared`；未填时 frontend 镜像构建会在 `npm ci` 阶段失败（401） |
+| `GH_PACKAGES_TOKEN` | **是（构建 frontend）** | GitHub PAT，需 `read:packages`，用于拉取 `@johnhan0313-git/shared`；Portainer 填此名，勿用 `GITHUB_TOKEN` |
 | `NEWSAPI_KEY` | 否 | [NewsAPI](https://newsapi.org/) 密钥；不配则 NewsAPI 来源采集失败，RSS 仍可用 |
 | `GNEWS_API_KEY` | 否 | [GNews](https://gnews.io/) 密钥；不配则 GNews 来源采集失败 |
 | `SCRAPER_BOSS_COOKIE` | 否 | BOSS 直聘 Cookie（curl `-b` 整段）；不配则 BOSS 爬虫可能失败 |
@@ -111,10 +119,10 @@ chmod +x scripts/deploy-john-server.sh
 
 ### Portainer 填表示例
 
-最小部署（仅 RSS，无 API Key）在 Portainer 中仍需配置 **`GITHUB_TOKEN`**（frontend 构建用），其余变量可不填：
+最小部署（仅 RSS，无 API Key）在 Portainer 中仍需配置 **`GH_PACKAGES_TOKEN`**（frontend 构建用），其余变量可不填：
 
 ```
-GITHUB_TOKEN=ghp_xxxxxxxx
+GH_PACKAGES_TOKEN=ghp_xxxxxxxx
 ```
 
 若要 NewsAPI + 代理爬虫：

@@ -6,7 +6,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "${ROOT}"
 
 ENV_FILE="${ENV_FILE:-.env.prod}"
-if [[ -z "${GITHUB_TOKEN:-}" && -f "${ENV_FILE}" ]]; then
+if [[ -z "${GH_PACKAGES_TOKEN:-}" && -z "${GITHUB_TOKEN:-}" && -f "${ENV_FILE}" ]]; then
   set -a
   # shellcheck disable=SC1090
   source "${ENV_FILE}"
@@ -19,10 +19,10 @@ BUILD_HTTPS_PROXY="${BUILD_HTTPS_PROXY:-http://172.17.0.1:7890}"
 NO_PROXY="${NO_PROXY:-localhost,127.0.0.1,john-postgresql,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12}"
 NPM_REGISTRY="${NPM_REGISTRY:-https://registry.npmmirror.com}"
 NEXT_PUBLIC_API_URL="${NEXT_PUBLIC_API_URL:-/api}"
-GITHUB_TOKEN="${GITHUB_TOKEN:-}"
+GH_PACKAGES_TOKEN="${GH_PACKAGES_TOKEN:-${GITHUB_TOKEN:-}}"
 
-if [[ -z "${GITHUB_TOKEN}" ]]; then
-  echo "错误: GITHUB_TOKEN 未设置。frontend 依赖 @johnhan0313-git/shared（GitHub Packages），构建前需 export GITHUB_TOKEN=ghp_..." >&2
+if [[ -z "${GH_PACKAGES_TOKEN}" ]]; then
+  echo "错误: GH_PACKAGES_TOKEN 未设置。frontend 依赖 @johnhan0313-git/shared（GitHub Packages），构建前需在 .env.prod 设置 GH_PACKAGES_TOKEN=ghp_..." >&2
   exit 1
 fi
 
@@ -43,7 +43,8 @@ docker build --memory="${BUILD_MEMORY}" \
   --build-arg "HTTPS_PROXY=${BUILD_HTTPS_PROXY}" \
   --build-arg "NO_PROXY=${NO_PROXY}" \
   --build-arg "NPM_REGISTRY=${NPM_REGISTRY}" \
-  --build-arg "GITHUB_TOKEN=${GITHUB_TOKEN}" \
+  --build-arg "GH_PACKAGES_TOKEN=${GH_PACKAGES_TOKEN}" \
+  --secret "id=npm_token,env=GH_PACKAGES_TOKEN" \
   --build-arg "NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}" \
   -t "${FRONTEND_IMAGE}" \
   -f frontend/Dockerfile frontend/
