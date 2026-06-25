@@ -59,6 +59,8 @@ FRONTEND_BUILD=(
 )
 if [[ -n "${GH_PACKAGES_TOKEN}" ]]; then
   FRONTEND_BUILD+=(--build-arg "GH_PACKAGES_TOKEN=${GH_PACKAGES_TOKEN}")
+elif [[ -f "${SHARED_TOKEN_FILE}" ]]; then
+  FRONTEND_BUILD+=(--secret "id=gh_packages_token,src=${SHARED_TOKEN_FILE}")
 fi
 FRONTEND_BUILD+=(-t "${FRONTEND_IMAGE}" -f frontend/Dockerfile frontend/)
 "${FRONTEND_BUILD[@]}"

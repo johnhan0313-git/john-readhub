@@ -4,48 +4,45 @@
 
 Cloudflare Tunnel 已配置 `*.cool-app.me` 泛域名转发到 nginx:1180，**无需再改 Tunnel**。
 
-## 前置条件（服务器侧，已完成）
+## 前置条件（服务器侧）
 
 - PostgreSQL 库 `readhub` / 用户 `readhub` 已创建
 - nginx 已配置 `news.cool-app.me` 路由（见 `deploy/nginx-readhub.conf`）
+- **Portainer 挂载 secrets 目录**（一次性，见下）+ `setup-server-secrets.sh`
+
+## Portainer 一次性：挂载共享 token（全项目只需一次）
+
+Portainer **UI 环境变量进不了 `build.args`**；宿主机 `/home/john-han/.secrets` 在 Portainer 容器内默认也**不可见**。做法：把宿主机目录挂进 Portainer，compose 读容器内 `/run/john-secrets/gh_packages_token`。
+
+**1. 写入 token（服务器一次）**
+
+```bash
+GH_PACKAGES_TOKEN=ghp_你的token ./scripts/setup-server-secrets.sh
+```
+
+**2. 给 Portainer 容器加 volume**（编辑 `~/portainer/portainer-compose.yaml`，参考 `deploy/portainer-compose.example.yaml`）
+
+```yaml
+volumes:
+  - /var/run/docker.sock:/var/run/docker.sock
+  - portainer_data:/data
+  - /home/john-han/.secrets:/run/john-secrets:ro   # 加这一行
+```
+
+```bash
+cd ~/portainer && docker compose up -d
+```
+
+之后所有 john-* Git Stack **不必**再配 `GH_PACKAGES_TOKEN` 环境变量。
 
 ## Portainer Git Stack 部署
 
-> **john-server 推荐**：若 Portainer 构建反复失败（npm 超时、容器名冲突），优先用 `./scripts/deploy-john-server.sh`（rsync + 本地构建，不依赖 GitHub clone）。
-
-1. Portainer → **Stacks** → **Add stack** → **Git repository**
+1. Portainer → **Stacks** → **Git repository**
 2. Repository URL：`https://github.com/johnhan0313-git/john-readhub.git`
 3. Compose path：`docker-compose.prod.yml`
-4. **勾选 Enable relative path volumes**（本地路径如 `/home/john-han/apps/john-readhub`）
-5. **Stack name 填 `john-readhub`**（与 nginx 中容器名一致）
-6. **Environment variables** 添加 `GH_PACKAGES_TOKEN=ghp_...`（Portainer 写入同目录 `stack.env`，构建时自动插值）
-7. **Deploy the stack**
-
-### 密钥怎么配（Portainer vs SSH）
-
-| 方式 | 配置位置 | 说明 |
-|------|----------|------|
-| **Portainer** | Stack → Environment variables → `GH_PACKAGES_TOKEN` | 存在 Portainer 数据卷 `stack.env`，**不要**用宿主机 `/home/john-han/.secrets/...`（Portainer 容器内看不到该路径） |
-| **SSH 脚本** | `/home/john-han/.secrets/gh_packages_token` | `setup-server-secrets.sh` 一次，供 `deploy-john-server.sh` 读取 |
-
-GitHub Packages token **不能 commit** 到 Git（Push Protection 会拦截）。
-
-**Portainer 填法**（每个 Stack 一条，或各项目共用同一 PAT）：
-
-```
-GH_PACKAGES_TOKEN=ghp_xxxxxxxx
-```
-
-填完后 **Update the stack** 保存，再 Pull and redeploy。
-
-**SSH 部署**（可选，不经过 Portainer 构建）：
-
-```bash
-GH_PACKAGES_TOKEN=ghp_... ./scripts/setup-server-secrets.sh
-./scripts/deploy-john-server.sh
-```
-
-若需 `NEWSAPI_KEY` 等，可再加 Portainer 环境变量或项目 `.env`（见 `.env.example`）。
+4. **Enable relative path volumes**（如 `/home/john-han/apps/john-readhub`）
+5. Stack name：**`john-readhub`**
+6. **Deploy the stack**（无需 Stack Environment variables 里的 token）
 
 `docker-compose.prod.yml` 已将 backend / frontend 加入外部网络 `john-nginx_default`，**无需**再手动执行 `docker network connect`。
 
@@ -81,9 +78,9 @@ Pull 失败但容器仍在跑时，**不要反复点 Pull**；确认 mihomo 正�
 
 若 **frontend `npm install` 报 ECONNRESET**（连 registry.npmjs.org 失败），需确保 Git 仓库已包含 `NPM_REGISTRY=registry.npmmirror.com` 的 Dockerfile 改动后再 Pull and redeploy。
 
-若 **frontend 构建报 `GH_PACKAGES_TOKEN is required`**：Portainer Stack 环境变量是否已填 `GH_PACKAGES_TOKEN` 并 Update the stack。
+若 **frontend 构建报 `GH_PACKAGES_TOKEN is required`**：检查 `setup-server-secrets.sh` 是否已执行，且 Portainer 是否已挂载 `/home/john-han/.secrets:/run/john-secrets:ro` 并重启。
 
-若报 **`failed to stat /home/john-han/.secrets/...`**：旧版 compose 用了宿主机路径，Portainer 容器内不可见；pull 最新代码（已改为 build.args + stack.env）后 redeploy。
+若报 **`failed to stat /home/john-han/.secrets/...`** 或 **`/run/john-secrets/...`**：未挂载或 token 文件不存在；按上文「Portainer 一次性」配置。
 
 若 **frontend 构建在 `npm ci` 失败（401 Unauthorized）**，说明 token 已传入但无效或权限不足，重新生成 PAT 并更新 `GH_PACKAGES_TOKEN`。
 
@@ -115,7 +112,7 @@ chmod +x scripts/deploy-john-server.sh
 
 | 变量 | 必填 | 说明 |
 |------|------|------|
-| `GH_PACKAGES_TOKEN` | **是（构建 frontend）** | Portainer Stack **Environment variables**；或 SSH `setup-server-secrets.sh` |
+| `GH_PACKAGES_TOKEN` | **是（构建 frontend）** | 服务器 `setup-server-secrets.sh` + Portainer 挂载 secrets（见上文）；**勿**用 Stack UI 环境变量 |
 | `NEWSAPI_KEY` | 否 | [NewsAPI](https://newsapi.org/) 密钥；不配则 NewsAPI 来源采集失败，RSS 仍可用 |
 | `GNEWS_API_KEY` | 否 | [GNews](https://gnews.io/) 密钥；不配则 GNews 来源采集失败 |
 | `SCRAPER_BOSS_COOKIE` | 否 | BOSS 直聘 Cookie（curl `-b` 整段）；不配则 BOSS 爬虫可能失败 |
@@ -136,7 +133,7 @@ chmod +x scripts/deploy-john-server.sh
 
 ### Portainer 填表示例
 
-最小部署：Portainer 环境变量填 `GH_PACKAGES_TOKEN`，Update stack 后 redeploy。
+最小部署：`setup-server-secrets.sh` + Portainer 加 volume 并重启，再 redeploy stack。
 
 若要 NewsAPI + 代理爬虫：
 
