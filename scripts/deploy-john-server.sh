@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 通过 rsync + docker compose 部署到 john-server，绕过 Portainer 从 GitHub 构建失败。
 # 用法：
-#   ./scripts/deploy-john-server.sh              # 生产，读根目录 .env
+#   ./scripts/deploy-john-server.sh
 #   DEPLOY_ENV=test ./scripts/deploy-john-server.sh
 
 set -euo pipefail
@@ -35,13 +35,9 @@ echo "→ docker build & up"
 ssh "${REMOTE}" bash -s <<EOF
 set -euo pipefail
 cd "${REMOTE_DIR}"
-if [[ ! -f "${ENV_FILE}" ]]; then
-  if [[ "${ENV_FILE}" == ".env" ]]; then
-    cp .env.example "${ENV_FILE}"
-  elif [[ -f .env.test.example ]]; then
-    cp .env.test.example "${ENV_FILE}"
-  fi
-  echo "已创建 ${ENV_FILE}，请编辑 GH_PACKAGES_TOKEN 后重新部署" >&2
+SHARED="${GH_PACKAGES_TOKEN_FILE:-/home/john-han/.secrets/gh_packages_token}"
+if [[ ! -f "\${SHARED}" ]]; then
+  echo "错误: 未找到 \${SHARED}，请在 john-server 执行一次 scripts/setup-server-secrets.sh" >&2
   exit 1
 fi
 export DOCKER_BUILDKIT=1
@@ -49,7 +45,11 @@ export COMPOSE_DOCKER_CLI_BUILD=1
 chmod +x scripts/docker-build.sh
 ENV_FILE="${ENV_FILE}" BUILD_MEMORY="\${BUILD_MEMORY:-4g}" ./scripts/docker-build.sh
 docker rm -f john-readhub-backend-1 john-readhub-frontend-1 2>/dev/null || true
-docker compose --env-file "${ENV_FILE}" -f docker-compose.prod.yml up -d --no-build --remove-orphans
+COMPOSE_ENV=()
+if [[ -f "${ENV_FILE}" ]]; then
+  COMPOSE_ENV=(--env-file "${ENV_FILE}")
+fi
+docker compose "\${COMPOSE_ENV[@]}" -f docker-compose.prod.yml up -d --no-build --remove-orphans
 docker compose -f docker-compose.prod.yml ps
 EOF
 

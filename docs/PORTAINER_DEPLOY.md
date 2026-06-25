@@ -18,29 +18,28 @@ Cloudflare Tunnel 已配置 `*.cool-app.me` 泛域名转发到 nginx:1180，**�
 3. Compose path：`docker-compose.prod.yml`
 4. **勾选 Enable relative path volumes**（本地路径如 `/home/john-han/apps/john-readhub`）
 5. **Stack name 填 `john-readhub`**（与 nginx 中容器名一致）
-6. 在服务器 stack 相对路径创建 **`.env`**（见下，**不要**把 token commit 到 Git）
-7. **Deploy the stack**
+6. **Deploy the stack**
 
-### 环境文件
+### 密钥与配置（不必每项目建 `.env`）
 
-| 文件 | 提交 Git | 说明 |
-|------|----------|------|
-| `.env.example` | ✅ | 模板 |
-| **`.env`** | ❌ | 生产配置，**仅在服务器/本机创建**，含 `GH_PACKAGES_TOKEN` |
-| `.env.test.example` | ✅ | 测试模板 |
-| `backend/.env` / `frontend/.env` | ❌ | 本地开发 |
+| 内容 | 位置 | 次数 |
+|------|------|------|
+| `GH_PACKAGES_TOKEN`（构建 frontend） | `/home/john-han/.secrets/gh_packages_token` | **全服务器一次** |
+| 本项目 API Key 等（可选） | 项目根目录 `.env` 或 Portainer UI | 按需 |
 
-GitHub **Push Protection 会拒绝**把 `ghp_` token 推进仓库，因此 `.env` 不能提交。
+GitHub Packages token **不能 commit**（Push Protection 会拦截）。所有 john-* 项目共用同一路径，compose 通过 BuildKit `secrets.file` 读取。
 
-**Portainer 一次性配置**（SSH 到服务器，路径与 stack 相对路径一致）：
+**john-server 一次性配置**（只需做一次，所有项目生效）：
 
 ```bash
-cd /home/john-han/apps/john-readhub
-cp .env.example .env
-nano .env   # 填入 GH_PACKAGES_TOKEN=ghp_...
+# 在 john-server 上，任意目录执行本仓库脚本均可
+GH_PACKAGES_TOKEN=ghp_你的token ./scripts/setup-server-secrets.sh
+# 或: echo 'ghp_...' | ./scripts/setup-server-secrets.sh
 ```
 
-之后 `git pull` 不会覆盖 `.env`（已在 `.gitignore`）。改 token 只改服务器上的 `.env`，无需 push。
+之后 Portainer **直接 Pull and redeploy**，无需每个项目再建 `.env`。
+
+若需为本项目单独配 `NEWSAPI_KEY` 等，可选创建 `.env`（见 `.env.example`），**不含 token 也能构建**。
 
 `docker-compose.prod.yml` 已将 backend / frontend 加入外部网络 `john-nginx_default`，**无需**再手动执行 `docker network connect`。
 
@@ -76,7 +75,7 @@ Pull 失败但容器仍在跑时，**不要反复点 Pull**；确认 mihomo 正�
 
 若 **frontend `npm install` 报 ECONNRESET**（连 registry.npmjs.org 失败），需确保 Git 仓库已包含 `NPM_REGISTRY=registry.npmmirror.com` 的 Dockerfile 改动后再 Pull and redeploy。
 
-若 **frontend 构建报 `GH_PACKAGES_TOKEN is required`**：服务器相对路径是否有 `.env` 且已填 token（不是 push 到 Git）。
+若 **frontend 构建报 `GH_PACKAGES_TOKEN is required`**：检查 `/home/john-han/.secrets/gh_packages_token` 是否存在（运行 `setup-server-secrets.sh`）。
 
 若 **frontend 构建在 `npm ci` 失败（401 Unauthorized）**，说明 token 已传入但无效或权限不足，重新生成 PAT 并更新 `GH_PACKAGES_TOKEN`。
 
@@ -108,7 +107,7 @@ chmod +x scripts/deploy-john-server.sh
 
 | 变量 | 必填 | 说明 |
 |------|------|------|
-| `GH_PACKAGES_TOKEN` | **是（构建 frontend）** | 写在服务器 **`.env`**（从 `.env.example` 复制），**勿 commit** |
+| `GH_PACKAGES_TOKEN` | **是（构建 frontend）** | 服务器 **`/home/john-han/.secrets/gh_packages_token`**（全项目一次，见 `setup-server-secrets.sh`） |
 | `NEWSAPI_KEY` | 否 | [NewsAPI](https://newsapi.org/) 密钥；不配则 NewsAPI 来源采集失败，RSS 仍可用 |
 | `GNEWS_API_KEY` | 否 | [GNews](https://gnews.io/) 密钥；不配则 GNews 来源采集失败 |
 | `SCRAPER_BOSS_COOKIE` | 否 | BOSS 直聘 Cookie（curl `-b` 整段）；不配则 BOSS 爬虫可能失败 |
@@ -129,7 +128,7 @@ chmod +x scripts/deploy-john-server.sh
 
 ### Portainer 填表示例
 
-最小部署：服务器 `cp .env.example .env` 并填 `GH_PACKAGES_TOKEN`，再 Portainer redeploy。
+最小部署：john-server 执行一次 `setup-server-secrets.sh`，Portainer redeploy 即可。
 
 若要 NewsAPI + 代理爬虫：
 

@@ -30,7 +30,7 @@
 ```bash
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
-cp .env.example .env          # 生产 compose，填入 GH_PACKAGES_TOKEN（勿 commit .env）
+# 生产 Docker（john-server 已 setup-server-secrets 后无需根目录 .env）
 docker compose -f docker-compose.prod.yml up --build
 ```
 

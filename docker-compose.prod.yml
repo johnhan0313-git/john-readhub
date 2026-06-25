@@ -55,8 +55,11 @@ services:
         HTTPS_PROXY: ${BUILD_HTTPS_PROXY:-http://172.17.0.1:7890}
         NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12}
         NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
-        GH_PACKAGES_TOKEN: ${GH_PACKAGES_TOKEN:-${GITHUB_TOKEN}}
+        # 本地构建 fallback；服务器默认从下方 secrets 文件读取，无需每项目 .env
+        GH_PACKAGES_TOKEN: ${GH_PACKAGES_TOKEN:-}
         NEXT_PUBLIC_API_URL: /api
+      secrets:
+        - gh_packages_token
     container_name: john-readhub-frontend-1
     ports:
       - "3001:3001"
@@ -66,6 +69,11 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+
+# john-server 全项目共用，一次性配置: scripts/setup-server-secrets.sh
+secrets:
+  gh_packages_token:
+    file: ${GH_PACKAGES_TOKEN_FILE:-/home/john-han/.secrets/gh_packages_token}
 
 networks:
   john-postgresql_default:
