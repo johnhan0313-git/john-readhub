@@ -1,6 +1,8 @@
 services:
   backend:
     image: john-readhub-backend:latest
+    # 本地构建镜像，不存在于 Docker Hub；避免 Portainer pull 阶段走华为镜像报 400
+    pull_policy: build
     build:
       context: ./backend
       extra_hosts:
@@ -43,6 +45,7 @@ services:
 
   frontend:
     image: john-readhub-frontend:latest
+    pull_policy: build
     build:
       context: ./frontend
       extra_hosts:

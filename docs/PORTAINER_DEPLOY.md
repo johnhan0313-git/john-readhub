@@ -62,6 +62,8 @@ GITHUB_TOKEN=ghp_xxxxxxxx   # read:packages 权限的 PAT
 
 Token 需对 `johnhan0313-git` 组织下的 `@johnhan0313-git/shared` 包有读取权限。配置后 Pull and redeploy。
 
+若 **compose pull 报 `john-readhub-backend:latest` / `john-readhub-frontend:latest` 400 Bad Request**（经 `mirror.swr.myhuaweicloud.com`），说明 Portainer 在拉取阶段把本地构建镜像当成 Docker Hub 官方镜像去拉了。`docker-compose.prod.yml` 已为 backend / frontend 设置 `pull_policy: build`；Pull 最新代码后 Redeploy。临时绕过可用 SSH 脚本 `./scripts/deploy-john-server.sh`。
+
 若报 **容器名 Conflict**（`john-readhub-backend-1` already in use），说明有手动部署的容器占用了名称。先 `docker rm -f john-readhub-backend-1 john-readhub-frontend-1`，再 Redeploy；或改用 `./scripts/deploy-john-server.sh` 统一管理。
 
 ### SSH 部署（推荐）
