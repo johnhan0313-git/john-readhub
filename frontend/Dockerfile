@@ -12,16 +12,13 @@ ARG HTTP_PROXY
 ARG HTTPS_PROXY
 ARG NO_PROXY
 ARG NPM_REGISTRY
-# Portainer 对 GITHUB_TOKEN 名易冲突；compose / .env.prod 优先用 GH_PACKAGES_TOKEN
 ARG GH_PACKAGES_TOKEN
 ARG GITHUB_TOKEN
 ENV HTTP_PROXY=$HTTP_PROXY HTTPS_PROXY=$HTTPS_PROXY NO_PROXY=$NO_PROXY
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN --mount=type=secret,id=npm_token,required=false \
-    TOKEN="$(cat /run/secrets/npm_token 2>/dev/null || true)" \
-    && TOKEN="${TOKEN:-${GH_PACKAGES_TOKEN:-${GITHUB_TOKEN}}}" \
-    && test -n "$TOKEN" || (echo "GH_PACKAGES_TOKEN is required to install @johnhan0313-git/shared from GitHub Packages" >&2 && exit 1) \
+RUN TOKEN="${GH_PACKAGES_TOKEN:-${GITHUB_TOKEN}}" \
+    && test -n "$TOKEN" || (echo "GH_PACKAGES_TOKEN is required. 在根目录 .env 中设置（Portainer 随 Git pull 自动读取）" >&2 && exit 1) \
     && printf '@johnhan0313-git:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=%s\nalways-auth=true\n' "$TOKEN" > .npmrc \
     && npm config set registry "${NPM_REGISTRY}" \
     && if [ -f package-lock.json ]; then npm ci; else npm install; fi

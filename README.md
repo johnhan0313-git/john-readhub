@@ -30,7 +30,8 @@
 ```bash
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
-docker compose up --build
+cp .env.example .env          # 生产 compose，填入 GH_PACKAGES_TOKEN（勿 commit .env）
+docker compose -f docker-compose.prod.yml up --build
 ```
 
 访问 http://localhost:3001 ，API 文档 http://localhost:8001/docs

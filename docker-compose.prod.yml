@@ -57,8 +57,6 @@ services:
         NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
         GH_PACKAGES_TOKEN: ${GH_PACKAGES_TOKEN:-${GITHUB_TOKEN}}
         NEXT_PUBLIC_API_URL: /api
-      secrets:
-        - npm_token
     container_name: john-readhub-frontend-1
     ports:
       - "3001:3001"
@@ -68,10 +66,6 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
-
-secrets:
-  npm_token:
-    environment: GH_PACKAGES_TOKEN
 
 networks:
   john-postgresql_default:

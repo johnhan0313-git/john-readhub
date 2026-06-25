@@ -16,10 +16,31 @@ Cloudflare Tunnel 已配置 `*.cool-app.me` 泛域名转发到 nginx:1180，**�
 1. Portainer → **Stacks** → **Add stack** → **Git repository**
 2. Repository URL：`https://github.com/johnhan0313-git/john-readhub.git`
 3. Compose path：`docker-compose.prod.yml`
-4. **勾选 Enable relative path volumes**（本地路径如 `/home/john-han/apps/john-readhub`）——Git 构建需要完整仓库与 `stack.env`
+4. **勾选 Enable relative path volumes**（本地路径如 `/home/john-han/apps/john-readhub`）
 5. **Stack name 填 `john-readhub`**（与 nginx 中容器名一致）
-6. 在 **Environment variables** 中按需填入（见下表）；**改完变量必须先点 Update the stack 保存**，再 Pull and redeploy
+6. 在服务器 stack 相对路径创建 **`.env`**（见下，**不要**把 token commit 到 Git）
 7. **Deploy the stack**
+
+### 环境文件
+
+| 文件 | 提交 Git | 说明 |
+|------|----------|------|
+| `.env.example` | ✅ | 模板 |
+| **`.env`** | ❌ | 生产配置，**仅在服务器/本机创建**，含 `GH_PACKAGES_TOKEN` |
+| `.env.test.example` | ✅ | 测试模板 |
+| `backend/.env` / `frontend/.env` | ❌ | 本地开发 |
+
+GitHub **Push Protection 会拒绝**把 `ghp_` token 推进仓库，因此 `.env` 不能提交。
+
+**Portainer 一次性配置**（SSH 到服务器，路径与 stack 相对路径一致）：
+
+```bash
+cd /home/john-han/apps/john-readhub
+cp .env.example .env
+nano .env   # 填入 GH_PACKAGES_TOKEN=ghp_...
+```
+
+之后 `git pull` 不会覆盖 `.env`（已在 `.gitignore`）。改 token 只改服务器上的 `.env`，无需 push。
 
 `docker-compose.prod.yml` 已将 backend / frontend 加入外部网络 `john-nginx_default`，**无需**再手动执行 `docker network connect`。
 
@@ -55,18 +76,7 @@ Pull 失败但容器仍在跑时，**不要反复点 Pull**；确认 mihomo 正�
 
 若 **frontend `npm install` 报 ECONNRESET**（连 registry.npmjs.org 失败），需确保 Git 仓库已包含 `NPM_REGISTRY=registry.npmmirror.com` 的 Dockerfile 改动后再 Pull and redeploy。
 
-若 **frontend 构建报 `GH_PACKAGES_TOKEN is required`** 或旧版 `GITHUB_TOKEN is required`（`npm ci` 前 exit 1），说明 **构建阶段没拿到 GitHub Packages token**。按顺序检查：
-
-1. Stack → Environment variables 使用 **`GH_PACKAGES_TOKEN`**（不要用 `GITHUB_TOKEN`，易与 Portainer 拉 Git 凭据冲突）
-2. 变量填完后点 **Update the stack** 保存，再 **Pull and redeploy**（仅 Pull 可能不带上次保存的变量）
-3. Git 仓库设置里 **Enable relative path volumes** 已开启
-4. Token 需 `read:packages`，且对 `@johnhan0313-git/shared` 有权限
-
-```
-GH_PACKAGES_TOKEN=ghp_xxxxxxxx
-```
-
-仍失败时改用 SSH：`./scripts/deploy-john-server.sh`（在服务器 `.env.prod` 填 `GH_PACKAGES_TOKEN`）。
+若 **frontend 构建报 `GH_PACKAGES_TOKEN is required`**：服务器相对路径是否有 `.env` 且已填 token（不是 push 到 Git）。
 
 若 **frontend 构建在 `npm ci` 失败（401 Unauthorized）**，说明 token 已传入但无效或权限不足，重新生成 PAT 并更新 `GH_PACKAGES_TOKEN`。
 
@@ -94,11 +104,11 @@ chmod +x scripts/deploy-john-server.sh
 | `HTTP_PROXY` / `HTTPS_PROXY` | `http://host.docker.internal:7890` | 运行时外网采集走宿主机 mihomo |
 | `NO_PROXY` | 内网 + `john-postgresql` | 数据库等内网不走代理 |
 
-### 建议按需配置（Portainer Environment variables）
+### 建议按需配置（写在根目录 `.env` / `.env.test`）
 
 | 变量 | 必填 | 说明 |
 |------|------|------|
-| `GH_PACKAGES_TOKEN` | **是（构建 frontend）** | GitHub PAT，需 `read:packages`，用于拉取 `@johnhan0313-git/shared`；Portainer 填此名，勿用 `GITHUB_TOKEN` |
+| `GH_PACKAGES_TOKEN` | **是（构建 frontend）** | 写在服务器 **`.env`**（从 `.env.example` 复制），**勿 commit** |
 | `NEWSAPI_KEY` | 否 | [NewsAPI](https://newsapi.org/) 密钥；不配则 NewsAPI 来源采集失败，RSS 仍可用 |
 | `GNEWS_API_KEY` | 否 | [GNews](https://gnews.io/) 密钥；不配则 GNews 来源采集失败 |
 | `SCRAPER_BOSS_COOKIE` | 否 | BOSS 直聘 Cookie（curl `-b` 整段）；不配则 BOSS 爬虫可能失败 |
@@ -119,11 +129,7 @@ chmod +x scripts/deploy-john-server.sh
 
 ### Portainer 填表示例
 
-最小部署（仅 RSS，无 API Key）在 Portainer 中仍需配置 **`GH_PACKAGES_TOKEN`**（frontend 构建用），其余变量可不填：
-
-```
-GH_PACKAGES_TOKEN=ghp_xxxxxxxx
-```
+最小部署：服务器 `cp .env.example .env` 并填 `GH_PACKAGES_TOKEN`，再 Portainer redeploy。
 
 若要 NewsAPI + 代理爬虫：
 

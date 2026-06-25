@@ -5,7 +5,12 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "${ROOT}"
 
-ENV_FILE="${ENV_FILE:-.env.prod}"
+DEPLOY_ENV="${DEPLOY_ENV:-prod}"
+if [[ "${DEPLOY_ENV}" == "test" ]]; then
+  ENV_FILE="${ENV_FILE:-.env.test}"
+else
+  ENV_FILE="${ENV_FILE:-.env}"
+fi
 if [[ -z "${GH_PACKAGES_TOKEN:-}" && -z "${GITHUB_TOKEN:-}" && -f "${ENV_FILE}" ]]; then
   set -a
   # shellcheck disable=SC1090
@@ -22,7 +27,7 @@ NEXT_PUBLIC_API_URL="${NEXT_PUBLIC_API_URL:-/api}"
 GH_PACKAGES_TOKEN="${GH_PACKAGES_TOKEN:-${GITHUB_TOKEN:-}}"
 
 if [[ -z "${GH_PACKAGES_TOKEN}" ]]; then
-  echo "错误: GH_PACKAGES_TOKEN 未设置。frontend 依赖 @johnhan0313-git/shared（GitHub Packages），构建前需在 .env.prod 设置 GH_PACKAGES_TOKEN=ghp_..." >&2
+  echo "错误: GH_PACKAGES_TOKEN 未设置。请在根目录 .env（生产）或 .env.test（测试）中设置" >&2
   exit 1
 fi
 
@@ -44,7 +49,6 @@ docker build --memory="${BUILD_MEMORY}" \
   --build-arg "NO_PROXY=${NO_PROXY}" \
   --build-arg "NPM_REGISTRY=${NPM_REGISTRY}" \
   --build-arg "GH_PACKAGES_TOKEN=${GH_PACKAGES_TOKEN}" \
-  --secret "id=npm_token,env=GH_PACKAGES_TOKEN" \
   --build-arg "NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}" \
   -t "${FRONTEND_IMAGE}" \
   -f frontend/Dockerfile frontend/
