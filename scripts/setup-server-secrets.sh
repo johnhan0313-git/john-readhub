@@ -7,6 +7,7 @@ set -euo pipefail
 
 DIR="${GH_PACKAGES_TOKEN_DIR:-/home/john-han/.secrets}"
 FILE="${GH_PACKAGES_TOKEN_FILE:-${DIR}/gh_packages_token}"
+OWNER="${SUDO_USER:-${USER:-john-han}}"
 
 mkdir -p "${DIR}"
 chmod 700 "${DIR}"
@@ -27,4 +28,7 @@ fi
 
 printf '%s' "${TOKEN}" > "${FILE}"
 chmod 600 "${FILE}"
-echo "✓ 已写入 ${FILE}（所有引用该路径的 compose 构建共用）"
+chown "${OWNER}:${OWNER}" "${FILE}" 2>/dev/null || true
+chown "${OWNER}:${OWNER}" "${DIR}" 2>/dev/null || true
+chmod 700 "${DIR}" 2>/dev/null || true
+echo "✓ 已写入 ${FILE}（供 deploy-john-server.sh；Portainer 请用 Stack 环境变量）"
