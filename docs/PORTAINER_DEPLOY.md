@@ -104,7 +104,7 @@ chmod +x scripts/deploy-john-server.sh
 | `DATABASE_URL` | `postgresql+psycopg://readhub:readhub-123@john-postgresql:5432/readhub` |
 | `USE_MIGRATIONS` | `true` |
 | `CORS_ORIGINS` | `https://news.cool-app.me,http://news.cool-app.me` |
-| `NEXT_PUBLIC_API_URL`（frontend build） | `/api` |
+| `NEXT_PUBLIC_API_URL`（frontend build） | `/api/v1` |
 | `HTTP_PROXY` / `HTTPS_PROXY` | `http://host.docker.internal:7890` | 运行时外网采集走宿主机 mihomo |
 | `NO_PROXY` | 内网 + `john-postgresql` | 数据库等内网不走代理 |
 
@@ -117,19 +117,17 @@ chmod +x scripts/deploy-john-server.sh
 | `GNEWS_API_KEY` | 否 | [GNews](https://gnews.io/) 密钥；不配则 GNews 来源采集失败 |
 | `SCRAPER_BOSS_COOKIE` | 否 | BOSS 直聘 Cookie（curl `-b` 整段）；不配则 BOSS 爬虫可能失败 |
 | `SCRAPER_MAIMAI_COOKIE` | 否 | 脉脉招聘 Cookie；不配则脉脉爬虫可能失败 |
-| `AI_LLM_API_KEY` | 否 | 事件聚类 LLM 密钥；不配则 `POST /api/admin/cluster-events` 跳过 |
+| `ADMIN_TOKEN` | 是（管理采集） | `X-Admin-Token`；未配置则 admin 返回 503 |
 
 ### 一般不用改（有默认值）
 
 | 变量 | 默认 | 说明 |
 |------|------|------|
-| `FETCH_INTERVAL_MINUTES` | `30` | 全量采集间隔（分钟） |
+| `FETCH_INTERVAL_MINUTES` | `30` | 非爬虫全量采集间隔（分钟） |
 | `RSS_FETCH_INTERVAL_MINUTES` | `15` | RSS 采集间隔 |
 | `SCRAPER_FETCH_INTERVAL_MINUTES` | `120` | 招聘爬虫间隔 |
 | `ARTICLE_RETENTION_DAYS` | `90` | 文章保留天数 |
 | `RUN_FETCH_ON_STARTUP` | `true` | 启动时是否立即采集 |
-| `AI_LLM_BASE_URL` | `https://api.openai.com/v1` | LLM API 地址 |
-| `AI_LLM_MODEL` | `gpt-4o-mini` | LLM 模型 |
 
 ### Portainer 填表示例
 
@@ -146,7 +144,7 @@ SCRAPER_BOSS_COOKIE=lastCity=...; wt2=...; bst=...
 
 - 站点：https://news.cool-app.me
 - API 文档：https://news.cool-app.me/api/docs
-- 手动采集：`curl -X POST https://news.cool-app.me/api/admin/fetch`
+- 手动采集：`curl -X POST https://news.cool-app.me/api/v1/admin/fetch -H "X-Admin-Token: $ADMIN_TOKEN"`
 
 ## 时间字段说明
 

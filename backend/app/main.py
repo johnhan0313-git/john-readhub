@@ -1,60 +1,67 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from contextlib import asynccontextmanager
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import admin, articles, categories, events, sources, timeline
+from app.api.v1 import api_v1_router
+from app.composition.container import build_container, set_container
 from app.config import get_settings
-from app.database import SessionLocal, init_db
-from app.fetchers.scrapers.playwright_util import close_browser
+from app.infrastructure.fetchers.scrapers.playwright_util import close_browser
+from app.infrastructure.persistence.unit_of_work import init_db
 from app.scheduler.jobs import (
     cleanup_articles_job,
-    fetch_all_sources_job,
+    fetch_non_scraper_sources_job,
     fetch_rss_sources_job,
     fetch_scraper_sources_job,
 )
-from app.services.seed import seed_database
 
+logger = logging.getLogger(__name__)
 scheduler = AsyncIOScheduler()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+    )
     settings = get_settings()
     init_db()
+    container = build_container()
+    set_container(container)
 
-    db = SessionLocal()
-    try:
-        result = seed_database(db)
-        print(
-            f"[seed] categories={result['categories']} "
-            f"updated={result.get('categories_updated', 0)} "
-            f"sources={result['sources']} "
-            f"sources_updated={result.get('sources_updated', 0)}"
-        )
-    finally:
-        db.close()
+    result = container.ingest.seed_sources()
+    logger.info(
+        "seed categories_created=%s categories_updated=%s sources_created=%s "
+        "sources_updated=%s sources_retired=%s",
+        result.categories_created,
+        result.categories_updated,
+        result.sources_created,
+        result.sources_updated,
+        result.sources_retired,
+    )
 
     if not settings.newsapi_key:
-        print("[WARN] NEWSAPI_KEY 未配置，NewsAPI 来源将采集失败。")
+        logger.warning("NEWSAPI_KEY not configured; NewsAPI sources will fail")
     if not settings.gnews_api_key:
-        print("[WARN] GNEWS_API_KEY 未配置，GNews 来源将采集失败。")
-    if not settings.llm_config().is_configured:
-        print("[WARN] AI_LLM_API_KEY 未配置，事件聚类功能将跳过。")
+        logger.warning("GNEWS_API_KEY not configured; GNews sources will fail")
+    if not settings.admin_token:
+        logger.warning("ADMIN_TOKEN not configured; admin routes will return 503")
     if not settings.scraper_boss_cookie:
-        print("[WARN] SCRAPER_BOSS_COOKIE 未配置，BOSS直聘爬虫将依赖 Playwright 且可能失败。")
+        logger.warning("SCRAPER_BOSS_COOKIE not configured")
     if not settings.scraper_maimai_cookie:
-        print("[WARN] SCRAPER_MAIMAI_COOKIE 未配置，脉脉招聘爬虫可能无法获取职位。")
+        logger.warning("SCRAPER_MAIMAI_COOKIE not configured")
 
     scheduler.add_job(
-        fetch_all_sources_job,
+        fetch_non_scraper_sources_job,
         "interval",
         minutes=settings.fetch_interval_minutes,
-        id="fetch_all",
+        id="fetch_non_scraper",
     )
     scheduler.add_job(
         fetch_rss_sources_job,
@@ -78,11 +85,12 @@ async def lifespan(app: FastAPI):
     scheduler.start()
 
     if settings.run_fetch_on_startup:
-        asyncio.create_task(fetch_all_sources_job())
+        asyncio.create_task(fetch_non_scraper_sources_job())
 
     yield
     scheduler.shutdown()
     await close_browser()
+    set_container(None)
 
 
 def create_app() -> FastAPI:
@@ -96,12 +104,7 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    app.include_router(articles.router, prefix="/api")
-    app.include_router(categories.router, prefix="/api")
-    app.include_router(timeline.router, prefix="/api")
-    app.include_router(sources.router, prefix="/api")
-    app.include_router(admin.router, prefix="/api")
-    app.include_router(events.router, prefix="/api")
+    app.include_router(api_v1_router)
     return app
 
 

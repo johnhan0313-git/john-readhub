@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Noto_Sans_SC } from "next/font/google";
 
-import { Navbar } from "@/components/navbar";
-import { Providers } from "@/components/providers";
+import { Navbar } from "@/shared/ui/navbar";
+import { Providers } from "@/shared/ui/providers";
 import "./globals.css";
 
 const notoSans = Noto_Sans_SC({

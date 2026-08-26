@@ -10,8 +10,8 @@ from sqlalchemy import engine_from_config, pool
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app.config import get_settings  # noqa: E402
-from app.database import Base  # noqa: E402
-from app import models  # noqa: E402, F401
+from app.infrastructure.persistence.unit_of_work import Base  # noqa: E402
+from app.infrastructure.persistence import models  # noqa: E402, F401
 
 config = context.config
 if config.config_file_name is not None:

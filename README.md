@@ -8,8 +8,8 @@
 - **分类汇总**：科技、IT技术、财经、商业、国内、国际、体育、娱乐、健康、汽车、教育、育儿、美食、职场、招聘、综合（16 类）
 - **去重**：URL 规范化哈希 + 标题模糊匹配
 - **文章时间线**：按日期分组展示新闻流
-- **定时任务**：启动时自动采集，RSS 每 15 分钟、全量每 30 分钟
-- **二期预留**：AI 事件聚类 API（`POST /api/admin/cluster-events`）
+- **定时任务**：启动时自动采集，RSS 每 15 分钟、非爬虫全量每 30 分钟、招聘爬虫每 120 分钟
+- **管理接口**：`POST /api/v1/admin/fetch` 需 `X-Admin-Token`
 
 ## 端口说明
 
@@ -63,7 +63,8 @@ npm run dev
 ### 手动触发采集
 
 ```bash
-curl -X POST http://localhost:8001/api/admin/fetch
+curl -X POST http://localhost:8001/api/v1/admin/fetch \
+  -H "X-Admin-Token: $ADMIN_TOKEN"
 ```
 
 ## 环境变量
@@ -73,24 +74,22 @@ curl -X POST http://localhost:8001/api/admin/fetch
 | `DATABASE_URL` | 默认 `postgresql+psycopg://readhub:readhub-123@localhost:5432/readhub`；生产见 `docker-compose.prod.yml` |
 | `USE_MIGRATIONS` | 默认 `true`，启动时自动 `alembic upgrade head` |
 | `CORS_ORIGINS` | 允许的前端来源，生产为 `https://news.cool-app.me` |
+| `ADMIN_TOKEN` | 管理接口共享密钥（`X-Admin-Token`）；未配置则 admin 返回 503 |
 | `NEWSAPI_KEY` | [NewsAPI](https://newsapi.org/) 密钥（可选） |
 | `GNEWS_API_KEY` | [GNews](https://gnews.io/) 密钥（可选） |
-| `FETCH_INTERVAL_MINUTES` | 全量采集间隔，默认 30 |
+| `FETCH_INTERVAL_MINUTES` | 非爬虫全量采集间隔，默认 30 |
 | `RSS_FETCH_INTERVAL_MINUTES` | RSS 采集间隔，默认 15 |
-| `AI_LLM_API_KEY` | 事件聚类用 LLM 密钥（二期，可选） |
 
 ## API 概览
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
-| GET | `/api/articles` | 文章列表（分页、分类、搜索） |
-| GET | `/api/articles/{id}` | 文章详情 |
-| GET | `/api/categories` | 分类及文章数 |
-| GET | `/api/timeline` | 按日期分组的时间线 |
-| GET | `/api/sources` | 数据源列表 |
-| POST | `/api/admin/fetch` | 手动触发采集 |
-| POST | `/api/admin/cluster-events` | 触发 AI 事件聚类 |
-| GET | `/api/events` | 事件列表（二期） |
+| GET | `/api/v1/articles` | 文章列表（分页、分类、搜索） |
+| GET | `/api/v1/articles/{id}` | 文章详情 |
+| GET | `/api/v1/categories` | 分类及文章数 |
+| GET | `/api/v1/timeline` | 按日期分组的时间线 |
+| GET | `/api/v1/sources` | 数据源列表 |
+| POST | `/api/v1/admin/fetch` | 手动触发采集（需 `X-Admin-Token`） |
 
 时间字段（`published_at`、`fetched_at`、`created_at` 等）均为 **毫秒级 Unix 时间戳**（整数）。
 
@@ -98,8 +97,8 @@ curl -X POST http://localhost:8001/api/admin/fetch
 
 ```
 john-readhub/
-├── backend/          # FastAPI + APScheduler + PostgreSQL
-├── frontend/         # Next.js 15 + Tailwind
+├── backend/          # FastAPI DDD：domains / application / infrastructure / api/v1
+├── frontend/         # Next.js 15：features/{feed,timeline,article-detail} + shared
 ├── deploy/           # nginx 配置片段
 ├── docs/             # Portainer 部署文档
 ├── scripts/          # PostgreSQL 初始化脚本
@@ -161,7 +160,7 @@ SCRAPER_MAIMAI_COOKIE=access_token=...; u=...; session=...; biz:jobs:session=...
 1. Arc 打开 BOSS / 脉脉并已登录
 2. 开发者工具 → Network → 刷新页面 → 点任意同域请求 → 复制 **Cookie**（或像你这样复制为 curl）
 3. 写入 `backend/.env`（见上格式）
-4. 重启后端：`curl -X POST http://localhost:8001/api/admin/fetch`
+4. 重启后端：`curl -X POST http://localhost:8001/api/v1/admin/fetch -H "X-Admin-Token: $ADMIN_TOKEN"`
 
 **说明：** 我在服务器侧用你提供的 Cookie 测试 BOSS 仍返回 `code=37 环境异常`（IP/指纹与浏览器不一致）。你在**本机 Mac** 跑后端成功率更高；猎聘无需 Cookie 即可用。
 

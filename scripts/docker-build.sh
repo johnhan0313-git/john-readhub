@@ -30,7 +30,7 @@ BUILD_HTTP_PROXY="${BUILD_HTTP_PROXY:-http://172.17.0.1:7890}"
 BUILD_HTTPS_PROXY="${BUILD_HTTPS_PROXY:-http://172.17.0.1:7890}"
 NO_PROXY="${NO_PROXY:-localhost,127.0.0.1,john-postgresql,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12}"
 NPM_REGISTRY="${NPM_REGISTRY:-https://registry.npmmirror.com}"
-NEXT_PUBLIC_API_URL="${NEXT_PUBLIC_API_URL:-/api}"
+NEXT_PUBLIC_API_URL="${NEXT_PUBLIC_API_URL:-/api/v1}"
 
 if [[ -z "${GH_PACKAGES_TOKEN}" && ! -f "${SHARED_TOKEN_FILE}" ]]; then
   echo "错误: 未找到 GitHub Packages token。服务器执行 scripts/setup-server-secrets.sh，或本地 .env / export GH_PACKAGES_TOKEN" >&2

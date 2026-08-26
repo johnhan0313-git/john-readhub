@@ -1,5 +1,5 @@
-from app.fetchers.scrapers.boss import BossZhipinFetcher
-from app.fetchers.scrapers.liepin import LiepinFetcher
+from app.infrastructure.fetchers.scrapers.boss import BossZhipinFetcher
+from app.infrastructure.fetchers.scrapers.liepin import LiepinFetcher
 
 
 def test_boss_parse_joblist():
@@ -44,4 +44,4 @@ def test_liepin_parse_payload():
     }
     articles = LiepinFetcher()._parse_payload(data, "Java")
     assert len(articles) == 1
-    assert articles[0].author == "测试公司"
+    assert "Java开发" in articles[0].title

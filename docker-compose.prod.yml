@@ -32,10 +32,8 @@ services:
       GNEWS_API_KEY: ${GNEWS_API_KEY:-}
       SCRAPER_BOSS_COOKIE: ${SCRAPER_BOSS_COOKIE:-}
       SCRAPER_MAIMAI_COOKIE: ${SCRAPER_MAIMAI_COOKIE:-}
-      AI_LLM_BASE_URL: ${AI_LLM_BASE_URL:-https://api.openai.com/v1}
-      AI_LLM_API_KEY: ${AI_LLM_API_KEY:-}
-      AI_LLM_MODEL: ${AI_LLM_MODEL:-gpt-4o-mini}
-      # john-server：RSS / NewsAPI / GNews / LLM 等外网请求走宿主机 mihomo（httpx 默认 trust_env）
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-}
+      # john-server：RSS / NewsAPI / GNews 等外网请求走宿主机 mihomo（httpx 默认 trust_env）
       HTTP_PROXY: ${HTTP_PROXY:-http://host.docker.internal:7890}
       HTTPS_PROXY: ${HTTPS_PROXY:-http://host.docker.internal:7890}
       NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,john-postgresql,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12}
@@ -56,7 +54,7 @@ services:
         NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12}
         NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
         GH_PACKAGES_TOKEN: ${GH_PACKAGES_TOKEN:-}
-        NEXT_PUBLIC_API_URL: /api
+        NEXT_PUBLIC_API_URL: /api/v1
       secrets:
         - gh_packages_token
     container_name: john-readhub-frontend-1
